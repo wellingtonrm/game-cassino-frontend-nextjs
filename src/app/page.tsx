@@ -3,19 +3,17 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
-import Sidebar from '../components/Sidebar';
-import TopBar from '../components/TopBar';
+
 import DashboardCards from '../components/DashboardCards';
 import TopLeaders from '../components/TopLeaders';
 import LiveFeed from '../components/LiveFeed';
-import ChatSidebar from '../components/ChatSidebar';
-import PromotionalBanner from '../components/PromotionalBanner';
+import LayoutGame from '@/components/LayoutGame';
+import PromotionalBanner from '@/components/PromotionalBanner';
 
 export default function Home() {
   const { isAuthenticated } = useAuth();
   const router = useRouter();
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [chatMessage, setChatMessage] = useState('');
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -58,42 +56,23 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0A0F1E] via-[#1a1b3a] to-[#0A0F1E] text-white">
-      <div className="flex">
-        {/* Sidebar */}
-        <Sidebar />
-        
-        {/* Main Content */}
-        <div className="flex-1 ml-16 p-4">
-          {/* Top Bar */}
-          <TopBar />
-          
-          {/* Dashboard Content */}
-          <div className="">
-            {/* Dashboard Cards */}
-            <DashboardCards topPlayers={topPlayers} />
-            
-            {/* Main Dashboard Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
-              {/* Top Leaders */}
-              <div className="lg:col-span-1">
-                <TopLeaders players={topPlayers} />
-              </div>
-              
-              {/* Live Feed */}
-              <div className="lg:col-span-2">
-                <LiveFeed feedItems={liveFeed} />
-              </div>
-            </div>
-          </div>
+    <LayoutGame chatMessages={chatMessages}>
+      {/* Dashboard Cards */}
+      <DashboardCards topPlayers={topPlayers} />
+
+      {/* Main Dashboard Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
+        {/* Top Leaders */}
+        <div className="lg:col-span-1">
+          <TopLeaders players={topPlayers} />
         </div>
-        
-        {/* Chat Sidebar */}
-        <ChatSidebar messages={chatMessages} />
+
+        {/* Live Feed */}
+        <div className="lg:col-span-2">
+          <LiveFeed feedItems={liveFeed} />
+        </div>
       </div>
-      
-      {/* Promotional Banner */}
       <PromotionalBanner />
-    </div>
+    </LayoutGame>
   );
 }

@@ -16,8 +16,8 @@ import Link from 'next/link';
 // Hook para detectar tamanho da tela
 function useWindowSize() {
   const [windowSize, setWindowSize] = useState({
-    width: typeof window !== 'undefined' ? window.innerWidth : 1024,
-    height: typeof window !== 'undefined' ? window.innerHeight : 768,
+    width: 1024,
+    height: 768,
   });
 
   useEffect(() => {

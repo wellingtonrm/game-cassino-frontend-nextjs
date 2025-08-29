@@ -26,13 +26,13 @@ const PromotionalBanner = ({
   };
 
   return (
-    <div className={`fixed bottom-4 left-24 right-4 bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 rounded-xl p-3 backdrop-blur-xl ${className}`}>
+    <div className={`fixed bottom-4 left-4 right-4 bg-gradient-to-r from-orange-500/60 to-red-500/60 border border-orange-500/30 rounded-xl p-3 backdrop-blur-xl ${className}`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <Gift className="w-6 h-6 text-orange-400" />
           <div>
-            <h3 className="font-bold text-sm text-orange-400">{title}</h3>
-            <p className="text-xs text-gray-300">{description}</p>
+            <h3 className="font-bold text-sm text-zinc-100">{title}</h3>
+            <p className="text-xs text-zinc-200">{description}</p>
           </div>
         </div>
         <button 
