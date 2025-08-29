@@ -12,12 +12,16 @@
     "@tanstack/react-query": "^5.85.5",
     "@tanstack/react-query-devtools": "^5.85.5",
     "axios": "^1.7.9",
+    "clsx": "^2.1.1",
+    "cookies-next": "^6.1.0",
     "framer-motion": "^12.23.12",
+    "jose": "^6.1.0",
     "lucide-react": "^0.542.0",
     "next": "15.5.2",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-hook-form": "^7.62.0",
+    "tailwind-merge": "^3.3.1",
     "zustand": "^5.0.8"
   },
   "devDependencies": {

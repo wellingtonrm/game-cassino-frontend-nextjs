@@ -5,6 +5,15 @@ export interface User {
   createdAt: string
 }
 
+export interface UsuarioLogin {
+  id: string
+  email: string
+  name: string
+  role: string
+  iat?: number
+  exp?: number
+}
+
 export interface LoginCredentials {
   email: string
   password: string
@@ -45,4 +54,19 @@ export interface Transaction {
   status: 'pending' | 'completed' | 'failed'
   createdAt: string
   paymentMethod: PaymentMethod
+}
+
+export interface Professor {
+  id: string
+  name: string
+  telefone?: string
+  account?: {
+    email: string
+  }
+}
+
+export interface UnauthorizedResponse {
+  code: number
+  success: boolean
+  message?: string
 }
