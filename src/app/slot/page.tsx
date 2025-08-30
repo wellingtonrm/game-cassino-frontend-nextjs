@@ -259,78 +259,62 @@ export default function NeonSlots() {
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
         <div className="max-w-7xl mx-auto px-4 py-6">
           
-          {/* Header com Saldo */}
-          <div className="mb-8">
-            <div className="bg-gradient-to-r from-yellow-600 via-yellow-500 to-yellow-600 rounded-2xl p-6 shadow-2xl border border-yellow-400/30">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-3xl font-bold text-white mb-2">🎰 NEON SLOTS</h1>
-                  <p className="text-yellow-100 opacity-90">Sua sorte está nas suas mãos!</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-yellow-100 text-sm mb-1">SALDO ATUAL</p>
-                  <motion.div 
-                    className="text-4xl font-bold text-white"
-                    key={gameState.balance}
-                    initial={{ scale: 1.1, color: '#10b981' }}
-                    animate={{ scale: 1, color: '#ffffff' }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    💰 {gameState.balance.toLocaleString()} créditos
-                  </motion.div>
-                </div>
-              </div>
-            </div>
-          </div>
+
 
           {/* Layout Principal */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Controles */}
             <div className="space-y-6">
               {/* Valor da Rodada */}
-              <div className="bg-gray-800/50 backdrop-blur-sm border border-yellow-500/50 rounded-xl p-6">
+              <div className="bg-gradient-to-br from-gray-900/90 via-gray-800/80 to-gray-900/90 backdrop-blur-sm border border-gray-600/40 rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300">
                 <div className="text-center">
-                  <h3 className="text-yellow-400 font-bold text-lg mb-4">🎯 VALOR DA RODADA</h3>
-                  <div className="space-y-4">
+                  <h3 className="text-gray-300 font-bold text-xl mb-6 flex items-center justify-center gap-2">
+                    🎯 <span>VALOR DA RODADA</span>
+                  </h3>
+                  <div className="space-y-6">
                     <motion.div 
-                      className="text-3xl font-bold text-white"
+                      className="text-4xl font-bold text-white bg-black/20 rounded-xl py-3 px-4"
                       key={betAmount}
                       initial={{ scale: 1.1, color: '#10b981' }}
                       animate={{ scale: 1, color: '#ffffff' }}
                       transition={{ duration: 0.3 }}
                     >
-                       {betAmount.toFixed(2)}
-                     </motion.div>
-                    <input
-                       type="range"
-                       min="0.5"
-                       max="10"
-                       step="0.5"
-                       value={betAmount}
-                       onChange={(e) => setBetAmount(parseFloat(e.target.value))}
-                       className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
-                       style={{
-                         background: `linear-gradient(to right, #fbbf24 0%, #fbbf24 ${((betAmount - 0.5) / 9.5) * 100}%, #374151 ${((betAmount - 0.5) / 9.5) * 100}%, #374151 100%)`
-                       }}
-                     />
-                    <div className="flex justify-between text-xs text-gray-400">
-                      <span>0,50</span>
-                      <span>10,00</span>
+                      R$ {betAmount.toFixed(2)}
+                    </motion.div>
+                    <div className="space-y-3">
+                      <input
+                        type="range"
+                        min="0.5"
+                        max="10"
+                        step="0.5"
+                        value={betAmount}
+                        onChange={(e) => setBetAmount(parseFloat(e.target.value))}
+                        className="w-full h-3 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                        style={{
+                          background: `linear-gradient(to right, #6b7280 0%, #6b7280 ${((betAmount - 0.5) / 9.5) * 100}%, #374151 ${((betAmount - 0.5) / 9.5) * 100}%, #374151 100%)`
+                        }}
+                      />
+                      <div className="flex justify-between text-sm text-gray-400 font-medium">
+                        <span>R$ 0,50</span>
+                        <span>R$ 10,00</span>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Adicionar Créditos */}
-              <div className="bg-gray-800/50 backdrop-blur-sm border border-green-500/50 rounded-xl p-6">
-                <h3 className="text-green-400 font-bold text-lg mb-4 text-center">💳 ADICIONAR CRÉDITOS</h3>
-                <div className="grid grid-cols-2 gap-3">
+              <div className="bg-gradient-to-br from-gray-900/90 via-gray-800/80 to-gray-900/90 backdrop-blur-sm border border-gray-600/40 rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300">
+                <h3 className="text-gray-300 font-bold text-xl mb-6 text-center flex items-center justify-center gap-2">
+                  💳 <span>ADICIONAR CRÉDITOS</span>
+                </h3>
+                <div className="grid grid-cols-2 gap-4">
                   {[50, 100, 200, 500].map(amount => (
                     <motion.button
                       key={amount}
                       onClick={() => addCredits(amount)}
-                      className="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-3 rounded-lg transition-all duration-200 text-sm"
-                      whileHover={{ scale: 1.05 }}
+                      className="bg-gradient-to-r from-gray-700 to-gray-600 hover:from-gray-600 hover:to-gray-500 text-white font-bold py-3 px-4 rounded-xl transition-all duration-200 text-sm shadow-lg hover:shadow-xl border border-gray-500/20"
+                      whileHover={{ scale: 1.05, y: -2 }}
                       whileTap={{ scale: 0.95 }}
                     >
                       +{amount}
@@ -340,35 +324,40 @@ export default function NeonSlots() {
               </div>
 
               {/* Configurações */}
-              <div className="bg-gray-800/50 backdrop-blur-sm border border-purple-500/50 rounded-xl p-6">
-                <h3 className="text-purple-400 font-bold text-lg mb-4 text-center">⚙️ CONFIGURAÇÕES</h3>
+              <div className="bg-gradient-to-br from-gray-900/90 via-gray-800/80 to-gray-900/90 backdrop-blur-sm border border-gray-600/40 rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300">
+                <h3 className="text-gray-300 font-bold text-xl mb-6 text-center flex items-center justify-center gap-2">
+                  ⚙️ <span>CONFIGURAÇÕES</span>
+                </h3>
                 <motion.button
                   onClick={toggleSound}
-                  className={`w-full flex items-center justify-center py-3 px-4 rounded-lg font-bold transition-all duration-200 ${
+                  className={`w-full flex items-center justify-center py-4 px-6 rounded-xl font-bold transition-all duration-200 shadow-lg ${
                     gameState.soundEnabled 
-                      ? 'bg-blue-600 text-white' 
-                      : 'bg-gray-600 text-gray-300'
+                      ? 'bg-gradient-to-r from-gray-700 to-gray-600 text-white border border-gray-500/30' 
+                      : 'bg-gradient-to-r from-gray-600 to-gray-500 text-gray-200 border border-gray-400/30'
                   }`}
-                  whileHover={{ scale: 1.02 }}
+                  whileHover={{ scale: 1.02, y: -1 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  {gameState.soundEnabled ? <Volume2 className="w-5 h-5 mr-2" /> : <VolumeX className="w-5 h-5 mr-2" />}
+                  {gameState.soundEnabled ? <Volume2 className="w-5 h-5 mr-3" /> : <VolumeX className="w-5 h-5 mr-3" />}
                   {gameState.soundEnabled ? 'Som Ligado' : 'Som Desligado'}
                 </motion.button>
               </div>
             </div>
 
             {/* Máquina de Slot */}
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-1">
               <motion.div 
-                className="bg-gray-800/50 backdrop-blur-sm border-2 border-yellow-500/50 rounded-2xl p-8"
+                className="bg-gradient-to-br from-gray-900/90 via-gray-800/80 to-gray-900/90 backdrop-blur-sm border-2 border-yellow-400/40 rounded-3xl p-8 shadow-2xl"
                 animate={gameState.isSpinning ? { 
-                  boxShadow: ['0 0 30px #fbbf24', '0 0 60px #f59e0b', '0 0 30px #fbbf24'] 
-                } : {}}
+                  boxShadow: ['0 0 40px #fbbf24', '0 0 80px #f59e0b', '0 0 40px #fbbf24'],
+                  borderColor: ['#fbbf24', '#f59e0b', '#fbbf24']
+                } : {
+                  boxShadow: '0 0 20px rgba(251, 191, 36, 0.3)'
+                }}
                 transition={{ duration: 0.8, repeat: gameState.isSpinning ? Infinity : 0 }}
               >
-                {/* Grade 3x3 - Maior */}
-                <div className="grid grid-cols-3 gap-6 mb-8 max-w-lg mx-auto">
+                {/* Grade 3x3 - Melhorada */}
+                <div className="grid grid-cols-3 gap-4 mb-8 max-w-md mx-auto">
                   {gameState.currentResult?.symbols.map((row, rowIndex) => 
                     row.map((symbol, colIndex) => {
                       const isWinningSymbol = gameState.currentResult?.winningLines.some(line => {
@@ -381,41 +370,46 @@ export default function NeonSlots() {
                       return (
                         <motion.div
                           key={`${rowIndex}-${colIndex}`}
-                          className={`aspect-square bg-gray-700 rounded-xl flex items-center justify-center text-6xl border-2 ${
+                          className={`aspect-square bg-gradient-to-br from-gray-800 via-gray-700 to-gray-800 rounded-2xl flex items-center justify-center text-5xl border-2 shadow-lg ${
                             isWinningSymbol 
-                              ? 'border-green-400 shadow-lg shadow-green-400/50' 
-                              : 'border-gray-600'
-                          }`}
+                              ? 'border-green-400 shadow-green-400/60 bg-gradient-to-br from-green-900/30 via-green-800/20 to-green-900/30' 
+                              : 'border-gray-500/50 hover:border-gray-400/70'
+                          } transition-all duration-300`}
                           animate={gameState.isSpinning ? {
-                            y: [0, -10, 0],
-                            rotateY: [0, 180, 360]
+                            y: [0, -15, 0],
+                            rotateY: [0, 180, 360],
+                            scale: [1, 0.9, 1]
                           } : isWinningSymbol ? {
-                            scale: [1, 1.1, 1],
-                            boxShadow: ['0 0 20px #10b981', '0 0 40px #10b981', '0 0 20px #10b981']
+                            scale: [1, 1.15, 1],
+                            boxShadow: ['0 0 25px #10b981', '0 0 50px #10b981', '0 0 25px #10b981'],
+                            borderColor: ['#10b981', '#34d399', '#10b981']
                           } : {}}
                           transition={{
-                            duration: gameState.isSpinning ? 0.3 + (rowIndex * colIndex * 0.1) : 0.6,
-                            repeat: gameState.isSpinning ? Infinity : isWinningSymbol ? Infinity : 0
+                            duration: gameState.isSpinning ? 0.4 + (rowIndex * colIndex * 0.1) : 0.8,
+                            repeat: gameState.isSpinning ? Infinity : isWinningSymbol ? Infinity : 0,
+                            ease: gameState.isSpinning ? 'easeInOut' : 'easeOut'
                           }}
                         >
-                          {symbol}
+                          <span className="drop-shadow-lg">{symbol}</span>
                         </motion.div>
                       );
                     })
                   ) || Array(9).fill(null).map((_, index) => (
                     <motion.div
                       key={index}
-                      className="aspect-square bg-gray-700 rounded-xl flex items-center justify-center text-6xl border-2 border-gray-600"
+                      className="aspect-square bg-gradient-to-br from-gray-800 via-gray-700 to-gray-800 rounded-2xl flex items-center justify-center text-5xl border-2 border-gray-500/50 shadow-lg transition-all duration-300"
                       animate={gameState.isSpinning ? {
-                        y: [0, -10, 0],
-                        rotateY: [0, 180, 360]
+                        y: [0, -15, 0],
+                        rotateY: [0, 180, 360],
+                        scale: [1, 0.9, 1]
                       } : {}}
                       transition={{
-                        duration: 0.3 + (Math.floor(index / 3) * (index % 3) * 0.1),
-                        repeat: gameState.isSpinning ? Infinity : 0
+                        duration: 0.4 + (Math.floor(index / 3) * (index % 3) * 0.1),
+                        repeat: gameState.isSpinning ? Infinity : 0,
+                        ease: 'easeInOut'
                       }}
                     >
-                      🎰
+                      <span className="drop-shadow-lg">🎰</span>
                     </motion.div>
                   ))}
                 </div>
@@ -442,15 +436,42 @@ export default function NeonSlots() {
                   <motion.button
                     onClick={spin}
                     disabled={gameState.isSpinning || gameState.balance < betAmount}
-                    className={`px-16 py-5 rounded-full font-bold text-2xl transition-all duration-300 ${
+                    className={`px-16 py-5 rounded-full font-bold text-2xl transition-all duration-300 relative overflow-hidden ${
                       gameState.isSpinning || gameState.balance < betAmount
-                        ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                        : 'bg-gradient-to-r from-pink-600 via-purple-600 to-cyan-600 hover:from-pink-500 hover:via-purple-500 hover:to-cyan-500 text-white shadow-2xl'
+                        ? 'bg-gradient-to-r from-gray-700 to-gray-600 text-gray-400 cursor-not-allowed border-2 border-gray-500'
+                        : 'bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 hover:from-gray-600 hover:via-gray-500 hover:to-gray-600 text-white shadow-2xl hover:shadow-gray-500/50 border-2 border-gray-500/50 hover:border-gray-400'
                     }`}
-                    whileHover={gameState.isSpinning || gameState.balance < betAmount ? {} : { scale: 1.05 }}
-                    whileTap={gameState.isSpinning || gameState.balance < betAmount ? {} : { scale: 0.95 }}
+                    whileHover={gameState.isSpinning || gameState.balance < betAmount ? {} : { 
+                    scale: 1.05,
+                    boxShadow: '0 0 30px rgba(107, 114, 128, 0.6)'
+                  }}
+                  whileTap={gameState.isSpinning || gameState.balance < betAmount ? {} : { scale: 0.95 }}
+                  animate={gameState.isSpinning ? {
+                    boxShadow: ['0 0 20px #6b7280', '0 0 40px #9ca3af', '0 0 20px #6b7280']
+                  } : {}}
+                  transition={{ duration: 0.6, repeat: gameState.isSpinning ? Infinity : 0 }}
                   >
-                    {gameState.isSpinning ? '🎰 GIRANDO...' : '🎰 GIRAR'}
+                    {!gameState.isSpinning && gameState.balance >= betAmount && (
+                      <motion.div 
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                        animate={{ x: ['-100%', '100%'] }}
+                        transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                      />
+                    )}
+                    <span className="relative z-10">
+                      {gameState.isSpinning ? (
+                        <div className="flex items-center justify-center gap-3">
+                          <motion.div 
+                            className="w-6 h-6 border-3 border-white border-t-transparent rounded-full"
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
+                          />
+                          🎰 GIRANDO...
+                        </div>
+                      ) : (
+                        `🎰 GIRAR - R$ ${betAmount.toFixed(2)}`
+                      )}
+                    </span>
                   </motion.button>
                 </div>
               </motion.div>
@@ -460,23 +481,27 @@ export default function NeonSlots() {
             {/* Histórico Lateral */}
             <div className="space-y-6">
               {/* Card de Informações */}
-              <div className="bg-gray-800/50 backdrop-blur-sm border border-blue-500/50 rounded-xl p-6">
-                <h3 className="text-blue-400 font-bold text-lg mb-4 text-center">📊 ESTATÍSTICAS</h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-300 text-sm">Jogadas:</span>
+              <div className="bg-gradient-to-br from-gray-900/90 via-gray-800/80 to-gray-900/90 backdrop-blur-sm border border-gray-600/40 rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300">
+
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center p-3 bg-gray-800/50 rounded-lg border border-gray-600/30">
+                    <span className="text-gray-300 font-medium">💰 Saldo:</span>
+                    <span className="text-white font-bold text-lg">{gameState.balance.toFixed(2)} créditos</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-gray-800/50 rounded-lg border border-gray-600/30">
+                    <span className="text-gray-300 font-medium">🎯 Jogadas:</span>
                     <span className="text-white font-bold">{stats.totalGames}</span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-300 text-sm">Vitórias:</span>
+                  <div className="flex justify-between items-center p-3 bg-gray-800/50 rounded-lg border border-gray-600/30">
+                    <span className="text-gray-300 font-medium">🏆 Vitórias:</span>
                     <span className="text-green-400 font-bold">{stats.wins}</span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-300 text-sm">Taxa:</span>
+                  <div className="flex justify-between items-center p-3 bg-gray-800/50 rounded-lg border border-gray-600/30">
+                    <span className="text-gray-300 font-medium">📈 Taxa:</span>
                     <span className="text-yellow-400 font-bold">{stats.winRate.toFixed(1)}%</span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-300 text-sm">Lucro:</span>
+                  <div className="flex justify-between items-center p-3 bg-gray-800/50 rounded-lg border border-gray-600/30">
+                    <span className="text-gray-300 font-medium">💸 Lucro:</span>
                     <span className={`font-bold ${stats.netProfit >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                       {stats.netProfit >= 0 ? '+' : ''}{stats.netProfit}
                     </span>
@@ -485,8 +510,10 @@ export default function NeonSlots() {
               </div>
 
               {/* Histórico de Jogadas */}
-              <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-500/50 rounded-xl p-6">
-                <h3 className="text-gray-400 font-bold text-lg mb-4 text-center">📜 HISTÓRICO</h3>
+              <div className="bg-gradient-to-br from-gray-900/90 via-gray-800/80 to-gray-900/90 backdrop-blur-sm border border-gray-600/40 rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300">
+                <h3 className="text-gray-300 font-bold text-xl mb-6 text-center flex items-center justify-center gap-2">
+                  📜 <span>HISTÓRICO</span>
+                </h3>
                 <div className="max-h-96 overflow-y-auto space-y-2">
                   {gameState.history.length === 0 ? (
                     <p className="text-gray-500 text-center text-sm">Nenhuma jogada ainda</p>
