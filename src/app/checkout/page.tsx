@@ -19,8 +19,8 @@ function CheckoutContent() {
   const searchParams = useSearchParams()
   const { formatCurrency, addMoney, isLoading } = useWallet()
   
-  const amount = parseFloat(searchParams.get('amount') || '0')
-  const method = searchParams.get('method') as 'pix' | 'credit_card'
+  const amount = parseFloat(searchParams?.get('amount') || '0')
+  const method = searchParams?.get('method') as 'pix' | 'credit_card'
   
   const [step, setStep] = useState<'payment' | 'processing' | 'success'>('payment')
   const [pixCode, setPixCode] = useState<string>('')

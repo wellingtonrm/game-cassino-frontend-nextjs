@@ -41,24 +41,24 @@ export default function ChatSidebar({ messages }: ChatSidebarProps) {
   };
 
   return (
-    <div className="w-full bg-gradient-to-b from-[#00011f] to-[#000318] border-l border-blue-800/20 flex flex-col h-full shadow-2xl backdrop-blur-sm">
+    <div className="w-full bg-gray-900/50 border-l border-gray-700/30 flex flex-col h-full">
       {/* Header */}
-      <div className="px-6 py-5 border-b border-blue-800/20 bg-gradient-to-r from-[#000318]/80 to-[#00011f]/80 backdrop-blur-md">
+      <div className="px-6 py-4 border-b border-gray-700/30">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg">
+            <div className="p-2 bg-blue-500 rounded-lg">
               <MessageCircle className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h3 className="font-semibold text-white text-sm tracking-wide">Chat ao Vivo</h3>
-              <p className="text-xs text-blue-300/80">Conversas em tempo real</p>
+              <h3 className="font-medium text-white text-sm">Chat ao Vivo</h3>
+              <p className="text-xs text-gray-400">Conversas em tempo real</p>
             </div>
           </div>
         </div>
         
-        <div className="flex items-center space-x-2 mt-4">
-          <div className="flex items-center space-x-2 bg-gradient-to-r from-green-900/40 to-emerald-900/40 px-4 py-2 rounded-full border border-green-700/30 backdrop-blur-sm">
-            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-400/50"></div>
+        <div className="flex items-center space-x-2 mt-3">
+          <div className="flex items-center space-x-2 bg-green-500/20 px-3 py-1.5 rounded-full">
+            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
             <Users className="w-3 h-3 text-green-300" />
             <span className="text-green-300 text-xs font-medium">324 online</span>
           </div>
@@ -66,27 +66,27 @@ export default function ChatSidebar({ messages }: ChatSidebarProps) {
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 p-5 space-y-5 overflow-y-auto bg-gradient-to-b from-[#000318]/50 to-[#00011f]/50 backdrop-blur-sm">
+      <div className="flex-1 p-4 space-y-3 overflow-y-auto">
         {displayMessages.map((msg, index) => (
           <div key={index} className={`flex ${
-            msg.type === 'system' ? 'justify-center' : 'items-start space-x-4'
+            msg.type === 'system' ? 'justify-center' : 'items-start space-x-3'
           }`}>
             {msg.type === 'system' ? (
-              <div className="bg-gradient-to-r from-blue-900/40 to-indigo-900/40 border border-blue-600/30 rounded-xl px-4 py-2 backdrop-blur-sm shadow-lg">
+              <div className="bg-blue-500/20 rounded-lg px-3 py-1.5">
                 <span className="text-blue-200 text-xs font-medium">{msg.message}</span>
               </div>
             ) : (
               <>
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg ring-2 ring-blue-400/20">
-                  <span className="text-sm font-bold text-white">{msg.user[0]}</span>
+                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="text-sm font-medium text-white">{msg.user[0]}</span>
                 </div>
                 <div className="flex-1 max-w-xs">
-                  <div className="bg-gradient-to-br from-[#001133]/80 to-[#000318]/80 rounded-2xl p-4 shadow-xl border border-blue-700/20 backdrop-blur-md hover:shadow-2xl transition-all duration-300">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-semibold text-white text-xs tracking-wide">{msg.user}</span>
-                      <span className="text-xs text-blue-300/70">{msg.time}</span>
+                  <div className="bg-white/5 rounded-lg p-3 hover:bg-white/10 transition-all duration-200">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-medium text-white text-xs">{msg.user}</span>
+                      <span className="text-xs text-gray-400">{msg.time}</span>
                     </div>
-                    <p className="text-sm text-blue-50 leading-relaxed">{msg.message}</p>
+                    <p className="text-sm text-gray-200">{msg.message}</p>
                   </div>
                 </div>
               </>
@@ -96,7 +96,7 @@ export default function ChatSidebar({ messages }: ChatSidebarProps) {
       </div>
 
       {/* Input Area */}
-      <div className="p-5 bg-gradient-to-r from-[#00011f]/90 to-[#000318]/90 border-t border-blue-700/20 backdrop-blur-md">
+      <div className="p-4 border-t border-gray-700/30">
         <div className="flex space-x-3">
           <input
             type="text"
@@ -104,26 +104,26 @@ export default function ChatSidebar({ messages }: ChatSidebarProps) {
             onChange={(e) => setChatMessage(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Digite sua mensagem..."
-            className="flex-1 bg-gradient-to-r from-[#000318]/80 to-[#001133]/80 border border-blue-700/30 rounded-xl px-5 py-3 text-sm text-white
+            className="flex-1 bg-white/5 border border-gray-600/30 rounded-lg px-4 py-2.5 text-sm text-white
                      focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400/50
-                     transition-all duration-300 placeholder-blue-300/60 backdrop-blur-sm shadow-inner
-                     hover:border-blue-600/40"
+                     transition-all duration-200 placeholder-gray-400
+                     hover:border-gray-500/50"
           />
           <button
             onClick={handleSendMessage}
-            className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-5 py-3 rounded-xl
-                     transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl
-                     focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:ring-offset-2 focus:ring-offset-[#00011f]
-                     disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95"
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2.5 rounded-lg
+                     transition-all duration-200 flex items-center justify-center
+                     focus:outline-none focus:ring-2 focus:ring-blue-400/50
+                     disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={!chatMessage.trim()}
           >
             <Send className="w-4 h-4" />
           </button>
         </div>
         
-        <div className="flex items-center justify-between mt-4 text-xs text-blue-300/70">
+        <div className="flex items-center justify-between mt-3 text-xs text-gray-400">
           <span>Pressione Enter para enviar</span>
-          <span className="bg-blue-900/30 px-2 py-1 rounded-md">{chatMessage.length}/500</span>
+          <span className="bg-white/10 px-2 py-1 rounded">{chatMessage.length}/500</span>
         </div>
       </div>
     </div>

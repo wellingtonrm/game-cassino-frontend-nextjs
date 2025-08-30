@@ -7,7 +7,6 @@ import { useAuth } from '@/hooks/useAuth';
 import DashboardCards from '../components/DashboardCards';
 import TopLeaders from '../components/TopLeaders';
 import LiveFeed from '../components/LiveFeed';
-import LayoutGame from '@/components/LayoutGame';
 import PromotionalBanner from '@/components/PromotionalBanner';
 
 export default function Home() {
@@ -56,12 +55,12 @@ export default function Home() {
   ];
 
   return (
-    <LayoutGame chatMessages={chatMessages}>
+    <section className="space-y-6">
       {/* Dashboard Cards */}
       <DashboardCards topPlayers={topPlayers} />
 
       {/* Main Dashboard Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Top Leaders */}
         <div className="lg:col-span-1">
           <TopLeaders players={topPlayers} />
@@ -72,7 +71,9 @@ export default function Home() {
           <LiveFeed feedItems={liveFeed} />
         </div>
       </div>
+      
+      {/* Promotional Banner */}
       <PromotionalBanner />
-    </LayoutGame>
+    </section>
   );
 }

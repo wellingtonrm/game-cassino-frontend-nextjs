@@ -1,6 +1,6 @@
 'use client';
 
-import { Bell, User, Wallet, Ticket, Dice6, Citrus, ChevronDown, Settings, UserCircle, CreditCard, LogOut, Home, MessageCircle } from 'lucide-react';
+import { Bell, User, Wallet, Ticket, Dice6, Citrus, ChevronDown, Settings, UserCircle, CreditCard, LogOut, Home, MessageCircle, Target } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useChatStore } from '@/stores/chatStore';
 import {
@@ -18,12 +18,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import Logo from './Logo';
 
 const gameItems = [
-  { icon: Home, route: '/', label: 'Home', color: 'from-blue-500 to-indigo-600' },
-  { icon: Citrus, route: '/slot', label: 'Slots Premium', color: 'from-purple-500 to-violet-600' },
-  { icon: Dice6, route: '/roleta', label: 'Roleta Clássica', color: 'from-rose-500 to-pink-600' },
-  { icon: Ticket, route: '/raspadinha', label: 'Raspadinha', color: 'from-emerald-500 to-teal-600' }
+  { icon: Home, route: '/', label: 'Home' },
+  { icon: Citrus, route: '/slot', label: 'Slots Premium' },
+  { icon: Dice6, route: '/roleta', label: 'Roleta Clássica' },
+  { icon: Ticket, route: '/raspadinha', label: 'Raspadinha' },
+  { icon: Target, route: '/plinko', label: 'Plinko' }
 ];
 
 export default function TopBar() {
@@ -42,14 +44,12 @@ export default function TopBar() {
 
   return (
     <TooltipProvider>
-      <header className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-6">
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            Painel da Loteria
-          </h1>
+      <header className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-8">
+          <Logo/>
           
           {/* Ícones de Jogos - Desktop Only */}
-          <div className="hidden lg:flex items-center gap-2">
+          <div className="hidden lg:flex items-center gap-1">
             {gameItems.map((item, index) => {
               const isActive = pathname === item.route;
               return (
@@ -59,13 +59,13 @@ export default function TopBar() {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleNavigation(item.route)}
-                      className={`p-3 rounded-xl transition-all duration-300 border ${
+                      className={`px-4 py-2 rounded-lg transition-all duration-200 ${
                         isActive
-                          ? `bg-gradient-to-r ${item.color} text-white border-white/20 shadow-lg shadow-current/20`
-                          : 'bg-slate-800/30 hover:bg-slate-700/50 text-slate-400 hover:text-white border-slate-600/30 hover:border-slate-500/50'
+                          ? 'bg-white/10 text-white'
+                          : 'text-gray-400 hover:text-white hover:bg-white/5'
                       }`}
                     >
-                      <item.icon className="w-5 h-5" />
+                      <item.icon className="w-4 h-4" />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -77,22 +77,22 @@ export default function TopBar() {
           </div>
         </div>
         
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-3">
           {/* Toggle Chat - Desktop Only */}
           <div className="hidden lg:block">
             <Tooltip>
               <TooltipTrigger asChild>
                 <button 
                   onClick={toggleVisibility}
-                  className={`relative p-2 rounded-lg transition-all duration-300 border ${
+                  className={`relative p-2 rounded-lg transition-all duration-200 ${
                     isChatVisible 
-                      ? 'bg-blue-600/20 hover:bg-blue-600/30 border-blue-500/50 text-blue-400' 
-                      : 'bg-slate-800/50 hover:bg-slate-700/70 border-slate-600/30 hover:border-slate-500/50 text-slate-400 hover:text-white'
+                      ? 'bg-blue-500/20 text-blue-400' 
+                      : 'text-gray-400 hover:text-white hover:bg-white/5'
                   }`}
                 >
-                  <MessageCircle className="w-4 h-4 transition-colors" />
+                  <MessageCircle className="w-4 h-4" />
                   {isChatVisible && (
-                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-400 rounded-full"></span>
                   )}
                 </button>
               </TooltipTrigger>
@@ -105,9 +105,9 @@ export default function TopBar() {
           {/* Notificações */}
           <Tooltip>
             <TooltipTrigger asChild>
-              <button className="relative p-2 bg-slate-800/50 hover:bg-slate-700/70 rounded-lg transition-all duration-300 border border-slate-600/30 hover:border-slate-500/50">
-                <Bell className="w-4 h-4 text-slate-400 hover:text-white transition-colors" />
-                <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+              <button className="relative p-2 rounded-lg transition-all duration-200 text-gray-400 hover:text-white hover:bg-white/5">
+                <Bell className="w-4 h-4" />
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-400 rounded-full"></span>
               </button>
             </TooltipTrigger>
             <TooltipContent>
@@ -120,48 +120,48 @@ export default function TopBar() {
             <DropdownMenuTrigger asChild>
               <Button 
                 variant="ghost" 
-                className="flex items-center space-x-3 bg-gradient-to-r from-[#00011f]/20 to-blue-600/20 hover:from-[#00011f]/30 hover:to-blue-600/30 rounded-lg px-3 py-2 border border-[#00011f]/30 hover:border-[#00011f]/50 transition-all duration-300 h-auto"
+                className="flex items-center space-x-3 bg-white/5 hover:bg-white/10 rounded-lg px-3 py-2 transition-all duration-200 h-auto"
               >
-                <div className="w-8 h-8 bg-gradient-to-r from-[#00011f] to-blue-600 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
                   <User className="w-4 h-4 text-white" />
                 </div>
                 <div className="hidden sm:block">
-                  <p className="font-semibold text-sm text-white">Jogador123</p>
-                  <p className="text-xs text-slate-400">Nível 15</p>
+                  <p className="font-medium text-sm text-white">Jogador123</p>
+                  <p className="text-xs text-gray-400">Nível 15</p>
                 </div>
                 <div className="hidden md:block text-right">
                   <div className="flex items-center space-x-1">
                     <Wallet className="w-3 h-3 text-green-400" />
-                    <span className="font-bold text-green-400 text-sm">R$ 2.450</span>
+                    <span className="font-semibold text-green-400 text-sm">R$ 2.450</span>
                   </div>
                   <div className="flex items-center space-x-1">
                     <Ticket className="w-3 h-3 text-blue-400" />
                     <span className="text-xs text-blue-400">12 bilhetes</span>
                   </div>
                 </div>
-                <ChevronDown className="w-4 h-4 text-slate-400" />
+                <ChevronDown className="w-4 h-4 text-gray-400" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent 
               align="end" 
-              className="w-56 bg-slate-900/95 backdrop-blur-xl border-slate-700/50 shadow-2xl"
+              className="w-56 bg-gray-900/95 backdrop-blur-sm border-gray-700/30"
             >
               <DropdownMenuLabel className="text-white">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-gradient-to-r from-[#00011f] to-blue-600 rounded-full flex items-center justify-center">
+                  <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
                     <User className="w-4 h-4 text-white" />
                   </div>
                   <div>
-                    <p className="font-semibold">Jogador123</p>
-                    <p className="text-xs text-slate-400">jogador123@email.com</p>
+                    <p className="font-medium">Jogador123</p>
+                    <p className="text-xs text-gray-400">jogador123@email.com</p>
                   </div>
                 </div>
               </DropdownMenuLabel>
-              <DropdownMenuSeparator className="bg-slate-700/50" />
+              <DropdownMenuSeparator className="bg-gray-700/30" />
               
               <DropdownMenuItem 
                 onClick={() => handleNavigation('/wallet')}
-                className="text-slate-300 hover:text-white hover:bg-slate-800/50 cursor-pointer"
+                className="text-gray-300 hover:text-white hover:bg-white/5 cursor-pointer"
               >
                 <Wallet className="w-4 h-4 mr-2" />
                 Carteira Digital
@@ -169,7 +169,7 @@ export default function TopBar() {
               
               <DropdownMenuItem 
                 onClick={() => handleNavigation('/perfil')}
-                className="text-slate-300 hover:text-white hover:bg-slate-800/50 cursor-pointer"
+                className="text-gray-300 hover:text-white hover:bg-white/5 cursor-pointer"
               >
                 <UserCircle className="w-4 h-4 mr-2" />
                 Perfil
@@ -177,7 +177,7 @@ export default function TopBar() {
               
               <DropdownMenuItem 
                 onClick={() => handleNavigation('/config')}
-                className="text-slate-300 hover:text-white hover:bg-slate-800/50 cursor-pointer"
+                className="text-gray-300 hover:text-white hover:bg-white/5 cursor-pointer"
               >
                 <Settings className="w-4 h-4 mr-2" />
                 Configurações
@@ -185,13 +185,13 @@ export default function TopBar() {
               
               <DropdownMenuItem 
                 onClick={() => handleNavigation('/withdraw')}
-                className="text-slate-300 hover:text-white hover:bg-slate-800/50 cursor-pointer"
+                className="text-gray-300 hover:text-white hover:bg-white/5 cursor-pointer"
               >
                 <CreditCard className="w-4 h-4 mr-2" />
                 Sacar
               </DropdownMenuItem>
               
-              <DropdownMenuSeparator className="bg-slate-700/50" />
+              <DropdownMenuSeparator className="bg-gray-700/30" />
               
               <DropdownMenuItem 
                 onClick={() => handleNavigation('/logout')}
