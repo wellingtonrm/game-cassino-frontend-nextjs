@@ -48,13 +48,13 @@ export function ControlsPanel({
   const canPlay = betAmount > 0 && betAmount <= balance && !isPlaying;
 
   return (
-    <div className="bg-black/20 rounded-xl border border-white/10 backdrop-blur-sm p-6 space-y-6">
+    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-6">
       <div>
-        <h3 className="text-lg font-semibold text-white mb-4">Controles de Aposta</h3>
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">Controles de Aposta</h3>
         
         {/* Bet Amount Input */}
         <div className="space-y-3">
-          <label className="text-sm font-medium text-gray-300">Valor da Aposta</label>
+          <label className="text-sm font-medium text-gray-600">Valor da Aposta</label>
           
           <div className="flex items-center space-x-2">
             <Button
@@ -62,7 +62,7 @@ export function ControlsPanel({
               size="sm"
               onClick={() => adjustBetAmount(0.5)}
               disabled={isPlaying}
-              className="border-white/20 text-white hover:bg-white/10"
+              className="border-gray-200 text-gray-600 hover:bg-gray-50"
             >
               <Minus className="w-4 h-4" />
             </Button>
@@ -72,7 +72,7 @@ export function ControlsPanel({
               value={inputValue}
               onChange={(e) => handleInputChange(e.target.value)}
               disabled={isPlaying}
-              className="text-center bg-white/10 border-white/20 text-white placeholder-gray-400"
+              className="text-center bg-gray-50 border-gray-200 text-gray-800 placeholder-gray-400"
               placeholder="0"
               min="1"
               max={balance}
@@ -83,7 +83,7 @@ export function ControlsPanel({
               size="sm"
               onClick={() => adjustBetAmount(2)}
               disabled={isPlaying || betAmount * 2 > balance}
-              className="border-white/20 text-white hover:bg-white/10"
+              className="border-gray-200 text-gray-600 hover:bg-gray-50"
             >
               <Plus className="w-4 h-4" />
             </Button>
@@ -92,7 +92,7 @@ export function ControlsPanel({
 
         {/* Quick Bet Buttons */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-300">Apostas Rápidas</label>
+          <label className="text-sm font-medium text-gray-600">Apostas Rápidas</label>
           <div className="grid grid-cols-2 gap-2">
             {quickBetAmounts.map((amount) => (
               <Button
@@ -101,7 +101,7 @@ export function ControlsPanel({
                 size="sm"
                 onClick={() => setBetAmount(amount)}
                 disabled={isPlaying || amount > balance}
-                className="border-white/20 text-white hover:bg-white/10"
+                className="border-gray-200 text-gray-600 hover:bg-gray-50"
               >
                 R$ {amount}
               </Button>
@@ -111,7 +111,7 @@ export function ControlsPanel({
 
         {/* Multiplier Buttons */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-300">Multiplicadores</label>
+          <label className="text-sm font-medium text-gray-600">Multiplicadores</label>
           <div className="grid grid-cols-2 gap-2">
             {multiplierButtons.map((multiplier) => (
               <Button
@@ -120,7 +120,7 @@ export function ControlsPanel({
                 size="sm"
                 onClick={() => adjustBetAmount(multiplier)}
                 disabled={isPlaying || betAmount * multiplier > balance}
-                className="border-white/20 text-white hover:bg-white/10"
+                className="border-gray-200 text-gray-600 hover:bg-gray-50"
               >
                 {multiplier}x
               </Button>
@@ -133,7 +133,7 @@ export function ControlsPanel({
       <Button
         onClick={onPlay}
         disabled={!canPlay}
-        className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold py-3 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 text-lg rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isPlaying ? (
           <div className="flex items-center space-x-2">
@@ -149,14 +149,14 @@ export function ControlsPanel({
       </Button>
 
       {/* Bet Info */}
-      <div className="text-sm text-gray-400 space-y-1">
+      <div className="text-sm text-gray-500 space-y-1">
         <div className="flex justify-between">
           <span>Aposta:</span>
-          <span className="text-white font-medium">R$ {betAmount.toFixed(2)}</span>
+          <span className="text-gray-800 font-medium">R$ {betAmount.toFixed(2)}</span>
         </div>
         <div className="flex justify-between">
           <span>Saldo após aposta:</span>
-          <span className="text-white font-medium">R$ {(balance - betAmount).toFixed(2)}</span>
+          <span className="text-gray-800 font-medium">R$ {(balance - betAmount).toFixed(2)}</span>
         </div>
       </div>
     </div>

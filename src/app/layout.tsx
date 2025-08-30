@@ -32,7 +32,7 @@ export default function RootLayout({
       >
 
         <Providers>
-          <main className="min-h-screen bg-gray-900 text-white">
+          <main className="min-h-screen bg-[#00011f] text-white">
             <div className="h-full">
               {/* Conteúdo com TopBar */}
               <div className="h-full overflow-y-auto">

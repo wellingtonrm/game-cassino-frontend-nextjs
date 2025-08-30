@@ -54,16 +54,16 @@ export default function PlinkoPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-      <Header />
+    <div className="min-h-screen">
       
-      <div className="container mx-auto px-4 py-6">
+      
+      <div className=" mx-auto px-4 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-[calc(100vh-120px)]">
           {/* Game Area */}
-          <div className="lg:col-span-3 bg-black/20 rounded-xl border border-white/10 backdrop-blur-sm">
-            <div className="p-4 border-b border-white/10">
-              <h2 className="text-2xl font-bold text-white mb-2">Plinko Game</h2>
-              <BalanceDisplay balance={balance} />
+          <div className="lg:col-span-3 bg-[#010112] rounded-2xl  shadow-sm">
+            <div className="p-6 border-b border-gray-100">
+              <h2 className="text-2xl font-semibold text-gray-100 mb-3">Plinko</h2>
+              
             </div>
             
             <div className="p-4 h-[calc(100%-80px)]">

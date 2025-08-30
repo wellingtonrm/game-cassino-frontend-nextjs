@@ -48,17 +48,17 @@ export function HistoryPanel({ gameHistory }: HistoryPanelProps) {
   const winRate = totalGames > 0 ? (gameHistory.filter(game => game.winAmount > game.betAmount).length / totalGames * 100) : 0;
 
   return (
-    <div className="bg-black/20 rounded-xl border border-white/10 backdrop-blur-sm p-6 space-y-4">
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-4">
       <div className="flex items-center space-x-2 mb-4">
-        <Clock className="w-5 h-5 text-purple-400" />
-        <h3 className="text-lg font-semibold text-white">Histórico de Jogadas</h3>
+        <Clock className="w-5 h-5 text-blue-600" />
+        <h3 className="text-lg font-semibold text-gray-800">Histórico de Jogadas</h3>
       </div>
 
       {/* Statistics */}
       {totalGames > 0 && (
-        <div className="grid grid-cols-1 gap-3 mb-4 p-3 bg-white/5 rounded-lg border border-white/10">
+        <div className="grid grid-cols-1 gap-3 mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
           <div className="text-center">
-            <p className="text-xs text-gray-400">Lucro Total</p>
+            <p className="text-xs text-gray-600">Lucro Total</p>
             <p className={`text-sm font-bold ${
               totalWinnings >= 0 ? 'text-green-400' : 'text-red-400'
             }`}>
@@ -68,12 +68,12 @@ export function HistoryPanel({ gameHistory }: HistoryPanelProps) {
           
           <div className="grid grid-cols-2 gap-3">
             <div className="text-center">
-              <p className="text-xs text-gray-400">Jogadas</p>
-              <p className="text-sm font-bold text-white">{totalGames}</p>
+              <p className="text-xs text-gray-600">Jogadas</p>
+              <p className="text-sm font-bold text-gray-800">{totalGames}</p>
             </div>
             <div className="text-center">
-              <p className="text-xs text-gray-400">Taxa de Vitória</p>
-              <p className="text-sm font-bold text-purple-400">{winRate.toFixed(1)}%</p>
+              <p className="text-xs text-gray-600">Taxa de Vitória</p>
+              <p className="text-sm font-bold text-blue-600">{winRate.toFixed(1)}%</p>
             </div>
           </div>
         </div>
@@ -83,10 +83,10 @@ export function HistoryPanel({ gameHistory }: HistoryPanelProps) {
       <div className="space-y-2 max-h-80 overflow-y-auto">
         {gameHistory.length === 0 ? (
           <div className="text-center py-8">
-            <div className="w-16 h-16 mx-auto mb-4 bg-white/10 rounded-full flex items-center justify-center">
-              <Clock className="w-8 h-8 text-gray-400" />
+            <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+              <Clock className="w-8 h-8 text-gray-500" />
             </div>
-            <p className="text-gray-400 text-sm">Nenhuma jogada ainda</p>
+            <p className="text-gray-600 text-sm">Nenhuma jogada ainda</p>
             <p className="text-gray-500 text-xs mt-1">Faça sua primeira aposta para ver o histórico</p>
           </div>
         ) : (
@@ -98,22 +98,22 @@ export function HistoryPanel({ gameHistory }: HistoryPanelProps) {
             return (
               <div
                 key={game.id}
-                className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors"
+                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors"
               >
                 <div className="flex items-center space-x-3">
                   {getResultIcon(game.winAmount, game.betAmount)}
                   
                   <div>
                     <div className="flex items-center space-x-2">
-                      <span className="text-sm font-medium text-white">
+                      <span className="text-sm font-medium text-gray-800">
                         {game.multiplier}x
                       </span>
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-gray-600">
                         {formatTime(game.timestamp)}
                       </span>
                     </div>
                     
-                    <div className="text-xs text-gray-400">
+                    <div className="text-xs text-gray-600">
                       Aposta: {formatCurrency(game.betAmount)}
                     </div>
                   </div>
