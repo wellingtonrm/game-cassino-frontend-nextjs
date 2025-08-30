@@ -256,11 +256,35 @@ export default function NeonSlots() {
   // ===== RENDER =====
   return (
     <LayoutGame chatMessages={chatMessages}>
-      <div className="min-h-screen">
-        <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          
+          {/* Header com Saldo */}
+          <div className="mb-8">
+            <div className="bg-gradient-to-r from-yellow-600 via-yellow-500 to-yellow-600 rounded-2xl p-6 shadow-2xl border border-yellow-400/30">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-3xl font-bold text-white mb-2">🎰 NEON SLOTS</h1>
+                  <p className="text-yellow-100 opacity-90">Sua sorte está nas suas mãos!</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-yellow-100 text-sm mb-1">SALDO ATUAL</p>
+                  <motion.div 
+                    className="text-4xl font-bold text-white"
+                    key={gameState.balance}
+                    initial={{ scale: 1.1, color: '#10b981' }}
+                    animate={{ scale: 1, color: '#ffffff' }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    💰 {gameState.balance.toLocaleString()} créditos
+                  </motion.div>
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* Layout Principal */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Controles */}
             <div className="space-y-6">
               {/* Valor da Rodada */}
