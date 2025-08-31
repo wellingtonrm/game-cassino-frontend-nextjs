@@ -1,3 +1,5 @@
+"use client"
+
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { AuthResponse, LoginCredentials, User } from '@/types'
 import { useAuthStore } from '@/stores/auth'

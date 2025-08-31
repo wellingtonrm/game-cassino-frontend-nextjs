@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "@/styles/globals.css";
-import { Providers } from "@/components/providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -83,31 +82,5 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <html lang="pt-BR" className="dark" data-arp="">
-      <head>
-        <link rel="icon" href="/icons/icon-192x192.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.svg" />
-        <link rel="mask-icon" href="/icons/icon-192x192.svg" color="#121212" />
-        <meta name="theme-color" content="#1a1a2e" />
-        <meta name="background-color" content="#1a1a2e" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="Online Casino" />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="msapplication-TileColor" content="#0b0d17" />
-        <meta name="msapplication-tap-highlight" content="no" />
-        <meta name="format-detection" content="telephone=no" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-      </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#212543] text-white min-h-screen`}
-      >
-        <Providers>
-          {children}
-        </Providers>
-      </body>
-    </html>
-  );
+  return children;
 }

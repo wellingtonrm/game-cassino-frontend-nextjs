@@ -5,6 +5,10 @@ export class PlinkoScene extends Phaser.Scene {
   private onBallDrop: () => void;
   private betAmount: number;
   
+  // Dimensões responsivas
+  private gameWidth: number = 800;
+  private gameHeight: number = 600;
+  
   // Configurações físicas da bola - ajuste estes valores para controlar o comportamento
   private ballPhysics = {
     // Restituição: quão "elástica" é a bola (0 = não quica, 1 = quica perfeitamente)
@@ -60,6 +64,10 @@ export class PlinkoScene extends Phaser.Scene {
   }
 
   create() {
+    // Obter dimensões da cena
+    this.gameWidth = this.cameras.main.width;
+    this.gameHeight = this.cameras.main.height;
+    
     // Create clean background
     this.createBackground();
     
@@ -84,20 +92,20 @@ export class PlinkoScene extends Phaser.Scene {
 
   private createBackground() {
     // Usar imagem de fundo em vez de gradiente
-    const background = this.add.image(400, 300, 'background1');
-    background.setDisplaySize(800, 600);
+    const background = this.add.image(this.gameWidth / 2, this.gameHeight / 2, 'background1');
+    background.setDisplaySize(this.gameWidth, this.gameHeight);
     background.setDepth(-10);
     
     // Camada escura sobre a imagem para destacar o jogo
     const darkOverlay = this.add.graphics();
     darkOverlay.fillStyle(0x000000, 0.7); // Escurecer ainda mais a imagem
-    darkOverlay.fillRect(0, 0, 800, 600);
+    darkOverlay.fillRect(0, 0, this.gameWidth, this.gameHeight);
     darkOverlay.setDepth(-2); // Camada superior à imagem mas inferior aos elementos do jogo
   }
 
   private createBallLauncher() {
     // Container para o lançador
-    this.ballLauncher = this.add.container(400, 30);
+    this.ballLauncher = this.add.container(this.gameWidth / 2, 30);
     
     // Base do canhão
     const cannonBase = this.add.graphics();
@@ -122,8 +130,8 @@ export class PlinkoScene extends Phaser.Scene {
    }
 
    private createSoundToggle() {
-     // Container para o botão de som
-     this.soundToggleButton = this.add.container(750, 50);
+    // Container para o botão de som
+    this.soundToggleButton = this.add.container(this.gameWidth - 50, 50);
      
      // Fundo mágico do botão
      const buttonBg = this.add.graphics();
@@ -280,24 +288,31 @@ export class PlinkoScene extends Phaser.Scene {
   
   private createBoundaries() {
     // Invisible physics boundaries only
-    this.matter.add.rectangle(0, 300, 20, 600, { isStatic: true });
-    this.matter.add.rectangle(800, 300, 20, 600, { isStatic: true });
-    this.matter.add.rectangle(400, 600, 800, 20, { isStatic: true });
+    this.matter.add.rectangle(0, this.gameHeight / 2, 20, this.gameHeight, { isStatic: true });
+    this.matter.add.rectangle(this.gameWidth, this.gameHeight / 2, 20, this.gameHeight, { isStatic: true });
+    this.matter.add.rectangle(this.gameWidth / 2, this.gameHeight, this.gameWidth, 20, { isStatic: true });
   }
   
   private createProfessionalPegs() {
-    const pegRadius = 6; // Reduzido apenas o tamanho
-    const rows = 15; // Aumentado para 15 fileiras para ter 17 pinos na base
-    const startY = 60; // Posição inicial mais alta
-    const rowSpacing = 25; // Espaçamento reduzido para caber mais fileiras
+    // Ajustar tamanho dos pinos baseado na largura da tela
+    const isMobile = this.gameWidth < 500;
+    const pegRadius = isMobile ? 4 : 6; // Pinos menores no mobile
+    const rows = 15;
+    const startY = 60;
+    
+    // Calcular espaçamento responsivo baseado na largura da tela
+    const availableWidth = this.gameWidth * 0.8; // 80% da largura da tela
+    const maxPegsInLastRow = rows + 2; // 17 pinos na última fileira
+    const pegSpacing = Math.min(isMobile ? 28 : 42, availableWidth / maxPegsInLastRow);
+    const rowSpacing = Math.min(isMobile ? 18 : 25, (this.gameHeight * 0.5) / rows);
     
     for (let row = 0; row < rows; row++) {
       const pegsInRow = row + 3;
-      const totalWidth = (pegsInRow - 1) * 42; // Reduzido para 42 para caber 17 pinos
-      const startX = 400 - totalWidth / 2;
+      const totalWidth = (pegsInRow - 1) * pegSpacing;
+      const startX = this.gameWidth / 2 - totalWidth / 2;
       
       for (let col = 0; col < pegsInRow; col++) {
-        const x = startX + col * 42; // Ajustado para 42 para corresponder às caixas
+        const x = startX + col * pegSpacing;
         const y = startY + row * rowSpacing;
         
         // Physics body
@@ -319,16 +334,22 @@ export class PlinkoScene extends Phaser.Scene {
   }
 
   private createPremiumMultiplierZones() {
-    const zoneWidth = 42; // Reduzido para melhor proporção
-    const zoneHeight = 50; // Altura proporcional
-    
-    // Posicionar multiplicadores mais próximos dos pinos
-    const zoneY = 450; // Posição mais próxima dos pinos
     const multiplierValues = [2.5, 2.0, 1.5, 0.5, 1.2, 1.0, 1.2, 1.1, 0.5, 1.2, 1.1, 0.5, 1.2, 1.5, 1.9, 2.0, 2.5];
-    
     const totalZones = multiplierValues.length;
+    
+    // Detectar se é mobile para ajustar dimensões
+    const isMobile = this.gameWidth < 500;
+    
+    // Calcular dimensões responsivas
+    const availableWidth = this.gameWidth * 0.9; // 90% da largura da tela
+    const zoneWidth = Math.min(isMobile ? 32 : 42, availableWidth / totalZones);
+    const zoneHeight = Math.min(isMobile ? 40 : 50, this.gameHeight * 0.08); // 8% da altura da tela
+    
+    // Posicionar multiplicadores mais próximos dos pinos no mobile
+    const bottomMargin = isMobile ? 15 : 30;
+    const zoneY = this.gameHeight - zoneHeight - bottomMargin;
     const totalWidth = totalZones * zoneWidth;
-    const startX = 400 - totalWidth / 2;
+    const startX = this.gameWidth / 2 - totalWidth / 2;
     
     multiplierValues.forEach((value, index) => {
       const x = startX + index * zoneWidth + zoneWidth / 2;
@@ -409,16 +430,19 @@ export class PlinkoScene extends Phaser.Scene {
       shadow.fillStyle(0x000000, 0.1);
       shadow.fillRoundedRect(-zoneWidth/2 + 1, -zoneHeight/2 + 1, zoneWidth, zoneHeight, 12);
       
+      // Ajustar tamanho da fonte para mobile
+      const fontSize = isMobile ? '12px' : '16px';
+      
       // Texto com sombra
       const textShadow = this.add.text(1, 1, `${value}x`, {
         fontFamily: 'Arial Black',
-        fontSize: '16px',
+        fontSize: fontSize,
         color: '#000000'
       }).setOrigin(0.5);
       
       const text = this.add.text(0, 0, `${value}x`, {
         fontFamily: 'Arial Black',
-        fontSize: '16px',
+        fontSize: fontSize,
         color: textColor
       }).setOrigin(0.5);
       
@@ -545,8 +569,10 @@ export class PlinkoScene extends Phaser.Scene {
   dropBall() {
     this.onBallDrop();
     
-    // Criar bola em posição aleatória no topo
-    const x = 360 + Math.random() * 80;
+    // Criar bola em posição aleatória no topo (responsivo)
+    const centerX = this.gameWidth / 2;
+    const randomRange = Math.min(80, this.gameWidth * 0.1); // 10% da largura ou 80px, o que for menor
+    const x = centerX - randomRange / 2 + Math.random() * randomRange;
     const y = 75;
     
     // Efeito sonoro de lançamento
@@ -555,14 +581,18 @@ export class PlinkoScene extends Phaser.Scene {
       this.playLaunchSound();
     }
     
+    // Ajustar tamanho da bola baseado na largura da tela
+    const isMobile = this.gameWidth < 500;
+    const ballRadius = isMobile ? 6 : 8; // Bola menor no mobile
+    
     // Criar bola visual simples
-    const ball = this.add.circle(x, y, 8, 0xffffff);
+    const ball = this.add.circle(x, y, ballRadius, 0xffffff);
     
     // Definir profundidade para ficar na frente das zonas de multiplicadores
     ball.setDepth(1);
     
     // Criar corpo físico da bola usando as configurações definidas
-    const ballBody = this.matter.add.circle(x, y, 8, {
+    const ballBody = this.matter.add.circle(x, y, ballRadius, {
       restitution: this.ballPhysics.restitution,   // Controla o quique
       friction: this.ballPhysics.friction,         // Controla o atrito com superfícies
       frictionAir: this.ballPhysics.frictionAir,   // Controla a resistência do ar (peso)

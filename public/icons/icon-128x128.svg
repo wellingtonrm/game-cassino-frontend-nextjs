@@ -1,0 +1,25 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="128" height="128" rx="16" fill="#1a1a2e"/>
+  <defs>
+    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffd700;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#d4af37;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#b8860b;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="purpleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#6366f1;stop-opacity:0.3" />
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="16" fill="url(#purpleGradient)"/>
+  <circle cx="64" cy="64" r="40" fill="url(#goldGradient)" stroke="#ffffff" stroke-width="2"/>
+  <circle cx="64" cy="64" r="30" fill="none" stroke="#1a1a2e" stroke-width="2"/>
+  <circle cx="64" cy="64" r="20" fill="none" stroke="#1a1a2e" stroke-width="2"/>
+  <polygon points="64,44 84,64 64,84 44,64" fill="#1a1a2e"/>
+  <polygon points="64,51 77,64 64,77 51,64" fill="url(#goldGradient)"/>
+  <circle cx="64" cy="34" r="4" fill="#1a1a2e"/>
+  <circle cx="64" cy="94" r="4" fill="#1a1a2e"/>
+  <circle cx="34" cy="64" r="4" fill="#1a1a2e"/>
+  <circle cx="94" cy="64" r="4" fill="#1a1a2e"/>
+  <text x="64" y="113" font-family="Arial, sans-serif" font-size="9" font-weight="bold" text-anchor="middle" fill="url(#goldGradient)">CASSINO</text>
+</svg>

@@ -1,0 +1,38 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" rx="64" fill="#1a1a2e"/>
+  
+  <!-- Gradient overlay -->
+  <defs>
+    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffd700;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#d4af37;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#b8860b;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="purpleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#6366f1;stop-opacity:0.3" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Purple overlay -->
+  <rect width="512" height="512" rx="64" fill="url(#purpleGradient)"/>
+  
+  <!-- Casino chip design -->
+  <circle cx="256" cy="256" r="160" fill="url(#goldGradient)" stroke="#ffffff" stroke-width="8"/>
+  <circle cx="256" cy="256" r="120" fill="none" stroke="#1a1a2e" stroke-width="6"/>
+  <circle cx="256" cy="256" r="80" fill="none" stroke="#1a1a2e" stroke-width="6"/>
+  
+  <!-- Center diamond -->
+  <polygon points="256,176 336,256 256,336 176,256" fill="#1a1a2e"/>
+  <polygon points="256,206 306,256 256,306 206,256" fill="url(#goldGradient)"/>
+  
+  <!-- Corner decorations -->
+  <circle cx="256" cy="136" r="16" fill="#1a1a2e"/>
+  <circle cx="256" cy="376" r="16" fill="#1a1a2e"/>
+  <circle cx="136" cy="256" r="16" fill="#1a1a2e"/>
+  <circle cx="376" cy="256" r="16" fill="#1a1a2e"/>
+  
+  <!-- Text -->
+  <text x="256" y="450" font-family="Arial, sans-serif" font-size="36" font-weight="bold" text-anchor="middle" fill="url(#goldGradient)">CASSINO</text>
+</svg>
