@@ -1,18 +1,12 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronDown, Plus, Minus, Menu, Bell, Home, Gamepad2, Activity, User, Wallet, 
-         TrendingUp, Trophy, Users, Play, Pause, RotateCcw, DollarSign, Target, 
-         Zap, BarChart3, Clock, Crown, Settings, Info, 
-         DivideCircleIcon} from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { ChevronDown, Menu, Bell, Home, Gamepad2, Activity, User, Wallet, 
+         TrendingUp, Trophy, Target, 
+         Zap, Crown, Settings, 
+         Play} from 'lucide-react'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 import Logo from '@/components/Logo'
 import { useNavigationStore, type NavigationTab } from '@/stores/navigationStore'
@@ -34,15 +28,6 @@ interface PlinkoSettings {
   risk: 'low' | 'average' | 'high'
   balance: number
 }
-
-// Mock data
-const mockStats: GameStats[] = [
-  { id: '1', username: 'Player1', bet: 10, multiplier: 5.2, payout: 52, time: '2 min ago' },
-  { id: '2', username: 'HighRoller', bet: 100, multiplier: 12.5, payout: 1250, time: '5 min ago' },
-  { id: '3', username: 'LuckyGamer', bet: 25, multiplier: 8.1, payout: 202.5, time: '8 min ago' },
-  { id: '4', username: 'ProPlayer', bet: 50, multiplier: 15.3, payout: 765, time: '12 min ago' },
-  { id: '5', username: 'CasinoKing', bet: 200, multiplier: 22.7, payout: 4540, time: '15 min ago' },
-]
 
 // Desktop stats format
 const highestWins = [
@@ -92,7 +77,7 @@ const PlinkoBoard = ({ isPlaying, gameSettings, setGameSettings, animating, setA
 }) => {
   const [ballPosition, setBallPosition] = useState({ x: 50, y: 0 })
 
-  const startGame = () => {
+  const startGame = useCallback(() => {
     if (animating) return
     setAnimating(true)
     setBallPosition({ x: 50, y: 0 })
@@ -202,13 +187,13 @@ const PlinkoBoard = ({ isPlaying, gameSettings, setGameSettings, animating, setA
     }
     
     animate()
-  }
+  }, [animating, setAnimating, setIsPlaying, gameSettings, setGameSettings])
 
   useEffect(() => {
     if (isPlaying) {
       startGame()
     }
-  }, [isPlaying])
+  }, [isPlaying, startGame])
 
   // Exactly 9 multipliers as shown in the image
   const multipliers = ['5.6x', '3x', '1.5x', '1.2x', '1.1x', '1.2x', '1.5x', '3x', '5.6x']
@@ -307,7 +292,14 @@ const PlinkoBoard = ({ isPlaying, gameSettings, setGameSettings, animating, setA
 }
 
 // Ripple Effect Component
-const RippleButton = ({ children, onClick, className, ...props }: any) => {
+type RippleButtonProps = {
+  children: React.ReactNode;
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  className?: string;
+  disabled?: boolean;
+} & React.ButtonHTMLAttributes<HTMLButtonElement>
+
+const RippleButton = ({ children, onClick, className, ...props }: RippleButtonProps) => {
   const [ripples, setRipples] = useState<Array<{ x: number; y: number; id: number }>>([])
 
   const addRipple = (event: React.MouseEvent) => {
