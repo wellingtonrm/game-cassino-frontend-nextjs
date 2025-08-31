@@ -313,7 +313,7 @@ export class PlinkoScene extends Phaser.Scene {
     
     // Posicionar multiplicadores mais próximos dos pinos
     const zoneY = 450; // Posição mais próxima dos pinos
-    const multiplierValues = [2.5, 2.0, 1.9, 1.5, 1.2, 1.0, 0.9, 0.5, 0.2, 0.5, 0.9, 1.0, 1.2, 1.5, 1.9, 2.0, 2.5];
+    const multiplierValues = [2.5, 2.0, 1.5, 0.5, 1.2, 1.0, 1.2, 0.0, 0.5, 1.2, 0.0, 0.5, 1.2, 1.5, 1.9, 2.0, 2.5];
     
     const totalZones = multiplierValues.length;
     const totalWidth = totalZones * zoneWidth;
