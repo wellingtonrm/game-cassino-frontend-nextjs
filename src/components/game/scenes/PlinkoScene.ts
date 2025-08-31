@@ -53,6 +53,12 @@ export class PlinkoScene extends Phaser.Scene {
     this.betAmount = betAmount;
   }
 
+  preload() {
+    // Carregar imagens de fundo
+    this.load.image('background1', '/plinko/back/cena1.png');
+    this.load.image('background2', '/plinko/back/cena2.png');
+  }
+
   create() {
     // Create clean background
     this.createBackground();
@@ -77,11 +83,16 @@ export class PlinkoScene extends Phaser.Scene {
   }
 
   private createBackground() {
-    this.backgroundGradient = this.add.graphics();
+    // Usar imagem de fundo em vez de gradiente
+    const background = this.add.image(400, 300, 'background1');
+    background.setDisplaySize(800, 600);
+    background.setDepth(-10);
     
-    // Clean solid background
-    this.backgroundGradient.fillStyle(0x1a1a2e);
-    this.backgroundGradient.fillRect(0, 0, 800, 600);
+    // Camada escura sobre a imagem para destacar o jogo
+    const darkOverlay = this.add.graphics();
+    darkOverlay.fillStyle(0x000000, 0.5); // Escurecer mais a imagem
+    darkOverlay.fillRect(0, 0, 800, 600);
+    darkOverlay.setDepth(-2); // Camada superior à imagem mas inferior aos elementos do jogo
   }
 
   private createBallLauncher() {
@@ -313,7 +324,7 @@ export class PlinkoScene extends Phaser.Scene {
     
     // Posicionar multiplicadores mais próximos dos pinos
     const zoneY = 450; // Posição mais próxima dos pinos
-    const multiplierValues = [2.5, 2.0, 1.5, 0.5, 1.2, 1.0, 1.2, 0.0, 0.5, 1.2, 0.0, 0.5, 1.2, 1.5, 1.9, 2.0, 2.5];
+    const multiplierValues = [2.5, 2.0, 1.5, 0.5, 1.2, 1.0, 1.2, 1.1, 0.5, 1.2, 1.1, 0.5, 1.2, 1.5, 1.9, 2.0, 2.5];
     
     const totalZones = multiplierValues.length;
     const totalWidth = totalZones * zoneWidth;
@@ -383,20 +394,20 @@ export class PlinkoScene extends Phaser.Scene {
         textColor = '#ffffff';
       }
       
-      // Fundo do pote com gradiente
+      // Design flat moderno
       const background = this.add.graphics();
-      background.fillGradientStyle(bgColor, bgColor, 0x000000, 0x000000, 0.8);
-      background.fillRoundedRect(-zoneWidth/2, -zoneHeight/2, zoneWidth, zoneHeight, 8);
+      background.fillStyle(bgColor, 0.9);
+      background.fillRoundedRect(-zoneWidth/2, -zoneHeight/2, zoneWidth, zoneHeight, 12);
       
-      // Borda do pote
+      // Borda sutil
       const border = this.add.graphics();
-      border.lineStyle(3, 0xffffff, 0.8);
-      border.strokeRoundedRect(-zoneWidth/2, -zoneHeight/2, zoneWidth, zoneHeight, 8);
+      border.lineStyle(2, 0xffffff, 0.3);
+      border.strokeRoundedRect(-zoneWidth/2, -zoneHeight/2, zoneWidth, zoneHeight, 12);
       
-      // Brilho interno
-      const innerGlow = this.add.graphics();
-      innerGlow.fillStyle(0xffffff, 0.2);
-      innerGlow.fillRoundedRect(-zoneWidth/2 + 2, -zoneHeight/2 + 2, zoneWidth - 4, zoneHeight/3, 6);
+      // Sombra suave
+      const shadow = this.add.graphics();
+      shadow.fillStyle(0x000000, 0.1);
+      shadow.fillRoundedRect(-zoneWidth/2 + 1, -zoneHeight/2 + 1, zoneWidth, zoneHeight, 12);
       
       // Texto com sombra
       const textShadow = this.add.text(1, 1, `${value}x`, {
@@ -411,7 +422,28 @@ export class PlinkoScene extends Phaser.Scene {
         color: textColor
       }).setOrigin(0.5);
       
-      container.add([background, border, innerGlow, textShadow, text]);
+      container.add([shadow, background, border, textShadow, text]);
+      
+      // Adicionar interatividade hover
+      container.setInteractive(new Phaser.Geom.Rectangle(-zoneWidth/2, -zoneHeight/2, zoneWidth, zoneHeight), Phaser.Geom.Rectangle.Contains);
+      
+      container.on('pointerover', () => {
+        background.clear();
+        background.fillStyle(bgColor, 1.0);
+        background.fillRoundedRect(-zoneWidth/2, -zoneHeight/2, zoneWidth, zoneHeight, 12);
+        border.clear();
+        border.lineStyle(3, 0xffffff, 0.6);
+        border.strokeRoundedRect(-zoneWidth/2, -zoneHeight/2, zoneWidth, zoneHeight, 12);
+      });
+      
+      container.on('pointerout', () => {
+         background.clear();
+         background.fillStyle(bgColor, 0.9);
+         background.fillRoundedRect(-zoneWidth/2, -zoneHeight/2, zoneWidth, zoneHeight, 12);
+         border.clear();
+         border.lineStyle(2, 0xffffff, 0.3);
+         border.strokeRoundedRect(-zoneWidth/2, -zoneHeight/2, zoneWidth, zoneHeight, 12);
+       });
       
       // Definir profundidade para ficar visível
       container.setDepth(1);
@@ -441,24 +473,58 @@ export class PlinkoScene extends Phaser.Scene {
             this.playMultiplierSound(multiplier.value);
           }
           
-          // Animate the winning zone
+          // Efeito na bola - criar um círculo visual temporário para animação
+          if (ball && ball.active) {
+            const ballEffect = this.add.circle(ball.x, ball.y, 8, 0xffffff, 0.8);
+            ballEffect.setDepth(3);
+            this.tweens.add({
+              targets: ballEffect,
+              scale: 2,
+              alpha: 0,
+              duration: 400,
+              ease: 'Back.easeOut',
+              onComplete: () => ballEffect.destroy()
+            });
+          }
+          
+          // Efeito de brilho na bola
+          const ballGlow = this.add.circle(ball.x, ball.y, 15, 0xffffff, 0.6);
+          ballGlow.setDepth(2);
           this.tweens.add({
-            targets: multiplier.container,
-            scaleX: 1.3,
-            scaleY: 1.3,
-            duration: 200,
-            yoyo: true,
-            ease: 'Back.easeOut'
+            targets: ballGlow,
+            scaleX: 2,
+            scaleY: 2,
+            alpha: 0,
+            duration: 500,
+            onComplete: () => ballGlow.destroy()
           });
           
+          // Animate the winning zone
+          if (multiplier.container && multiplier.container.active) {
+            this.tweens.add({
+              targets: multiplier.container,
+              scale: 1.3,
+              duration: 200,
+              yoyo: true,
+              ease: 'Back.easeOut'
+            });
+          }
+          
+          // Efeito de confete para valores altos
+          if (multiplier.value >= 2.0) {
+            this.createConfettiEffect(multiplier.container.x, multiplier.container.y);
+          }
+          
           // Flash effect
-          this.tweens.add({
-            targets: multiplier.text,
-            alpha: 0.3,
-            duration: 100,
-            yoyo: true,
-            repeat: 3
-          });
+          if (multiplier.text && multiplier.text.active) {
+            this.tweens.add({
+              targets: multiplier.text,
+              alpha: 0.3,
+              duration: 100,
+              yoyo: true,
+              repeat: 3
+            });
+          }
           
           // Remove ball after short delay
           this.time.delayedCall(500, () => {
@@ -510,7 +576,41 @@ export class PlinkoScene extends Phaser.Scene {
     this.balls.push(ball);
   }
 
+  private createConfettiEffect(x: number, y: number) {
+    const colors = [0xff6b6b, 0x4ecdc4, 0x45b7d1, 0xf9ca24, 0xf0932b, 0xeb4d4b, 0x6c5ce7];
+    
+    for (let i = 0; i < 15; i++) {
+      const confetti = this.add.rectangle(
+        x + (Math.random() - 0.5) * 20,
+        y + (Math.random() - 0.5) * 20,
+        6,
+        6,
+        colors[Math.floor(Math.random() * colors.length)]
+      );
+      
+      confetti.setDepth(3);
+      
+      this.tweens.add({
+        targets: confetti,
+        x: x + (Math.random() - 0.5) * 200,
+        y: y + Math.random() * 100 + 50,
+        rotation: Math.random() * Math.PI * 2,
+        alpha: 0,
+        duration: 1000 + Math.random() * 500,
+        ease: 'Cubic.easeOut',
+        onComplete: () => confetti.destroy()
+      });
+    }
+  }
+
   update() {
-    // Simple update - physics handles ball movement automatically
+    // Clean up balls that have fallen off screen
+    this.balls = this.balls.filter(ball => {
+      if (ball.y > 650) {
+        ball.destroy();
+        return false;
+      }
+      return true;
+    });
   }
 }
