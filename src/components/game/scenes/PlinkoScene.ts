@@ -90,7 +90,7 @@ export class PlinkoScene extends Phaser.Scene {
     
     // Camada escura sobre a imagem para destacar o jogo
     const darkOverlay = this.add.graphics();
-    darkOverlay.fillStyle(0x000000, 0.5); // Escurecer mais a imagem
+    darkOverlay.fillStyle(0x000000, 0.7); // Escurecer ainda mais a imagem
     darkOverlay.fillRect(0, 0, 800, 600);
     darkOverlay.setDepth(-2); // Camada superior à imagem mas inferior aos elementos do jogo
   }
