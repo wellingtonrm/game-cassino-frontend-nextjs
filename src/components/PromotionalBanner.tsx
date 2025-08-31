@@ -1,6 +1,6 @@
 'use client';
 
-import { Gift } from 'lucide-react';
+import { Gift, Sparkles } from 'lucide-react';
 
 interface PromotionalBannerProps {
   title?: string;
@@ -26,18 +26,20 @@ const PromotionalBanner = ({
   };
 
   return (
-    <div className={`fixed bottom-4 left-4 right-4 bg-gradient-to-r from-orange-500/60 to-red-500/60 border border-orange-500/30 rounded-xl p-3 backdrop-blur-xl ${className}`}>
+    <div className={`fixed bottom-4 left-4 right-4 casino-glass border border-casino-gold/30 rounded-2xl p-4 backdrop-blur-xl casino-glow-gold ${className}`}>
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <Gift className="w-6 h-6 text-orange-400" />
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 bg-casino-gradient rounded-xl flex items-center justify-center casino-glow-gold">
+            <Sparkles className="w-5 h-5 text-casino-dark" />
+          </div>
           <div>
-            <h3 className="font-bold text-sm text-zinc-100">{title}</h3>
-            <p className="text-xs text-zinc-200">{description}</p>
+            <h3 className="font-bold text-lg text-casino-light">{title}</h3>
+            <p className="text-sm text-casino-light/80">{description}</p>
           </div>
         </div>
         <button 
           onClick={handleClick}
-          className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold px-4 py-1 rounded-lg text-sm transition-all duration-300"
+          className="bg-casino-gradient hover:scale-105 text-casino-dark font-bold px-6 py-2 rounded-xl transition-all duration-300 casino-glow-gold"
         >
           {buttonText}
         </button>

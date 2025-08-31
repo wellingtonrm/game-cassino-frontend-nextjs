@@ -1,6 +1,6 @@
 'use client';
 
-import { Crown } from 'lucide-react';
+import Image from 'next/image';
 
 interface LogoProps {
   size?: 'sm' | 'md' | 'lg';
@@ -22,7 +22,13 @@ const Logo = ({ size = 'md', className = '' }: LogoProps) => {
 
   return (
     <div className={`${sizeClasses[size]} bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/50 ${className}`}>
-      <Crown className={`${iconSizes[size]} text-white`} />
+      <Image 
+        src="/icon-logo.svg" 
+        alt="Boominas Logo" 
+        width={parseInt(iconSizes[size].split(' ')[0].replace('w-', '')) * 4}
+        height={parseInt(iconSizes[size].split(' ')[0].replace('w-', '')) * 4}
+        className={`${iconSizes[size]} object-contain`}
+      />
     </div>
   );
 };

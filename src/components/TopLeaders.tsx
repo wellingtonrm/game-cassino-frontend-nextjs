@@ -1,6 +1,6 @@
 'use client';
 
-import { Award } from 'lucide-react';
+import { Award, Trophy } from 'lucide-react';
 
 interface Player {
   name: string;
@@ -15,18 +15,25 @@ interface TopLeadersProps {
 
 export default function TopLeaders({ players }: TopLeadersProps) {
   return (
-    <div className="mb-6">
-      <h2 className="text-xl font-bold mb-3 bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">🏆 Melhores Jogadores</h2>
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+    <div className="mb-8">
+      <div className="flex items-center space-x-3 mb-6">
+        <div className="w-10 h-10 bg-casino-gradient rounded-xl flex items-center justify-center casino-glow-gold">
+          <Trophy className="w-5 h-5 text-casino-dark" />
+        </div>
+        <h2 className="text-2xl font-bold text-casino-light">Melhores Jogadores</h2>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         {players.map((player, index) => (
-          <div key={index} className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 rounded-lg p-3 border border-yellow-500/20 hover:border-yellow-400/40 transition-all duration-300 hover:scale-105">
+          <div key={index} className="casino-glass rounded-2xl p-4 casino-glow-secondary hover:scale-105 transition-all duration-300 group">
             <div className="text-center">
-              <div className="text-2xl mb-2">{player.avatar}</div>
-              <h3 className="font-bold text-sm">{player.name}</h3>
-              <p className="text-yellow-400 font-bold text-sm">{player.winnings}</p>
-              <div className="flex items-center justify-center space-x-1 mt-1">
-                <Award className="w-3 h-3 text-yellow-400" />
-                <span className="text-xs text-gray-400">#{player.rank}</span>
+              <div className="w-12 h-12 bg-casino-quaternary/20 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-casino-gold/20 transition-all">
+                <span className="text-2xl">{player.avatar}</span>
+              </div>
+              <h3 className="font-bold text-casino-light mb-1">{player.name}</h3>
+              <p className="text-casino-gold font-bold text-lg mb-2">{player.winnings}</p>
+              <div className="flex items-center justify-center space-x-2">
+                <Award className="w-4 h-4 text-casino-gold" />
+                <span className="text-sm text-casino-light/60 font-medium">#{player.rank}</span>
               </div>
             </div>
           </div>

@@ -1,19 +1,44 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-  --primary: #3b82f6;
+  /* Dark Woods Theme */
+  --casino-primary: #3747A6;
+  --casino-secondary: #263173;
+  --casino-tertiary: #1D2659;
+  --casino-quaternary: #1A2040;
+  --casino-dark: #151826;
+  
+  /* It's Getting Loud Theme */
+  --casino-red: #A60321;
+  --casino-pink: #F2A0C6;
+  --casino-dark-alt: #241E26;
+  --casino-cyan: #15A0BF;
+  --casino-light: #F2EBE9;
+  
+  /* Casino Gold Accent */
+  --casino-gold: #FFD700;
+  --casino-gold-dark: #B8860B;
+  
+  /* Main Theme Variables */
+  --background: var(--casino-dark);
+  --foreground: var(--casino-light);
+  --primary: var(--casino-primary);
   --primary-foreground: #ffffff;
-  --secondary: #0f131a;
-  --secondary-foreground: #f9fafb;
-  --accent: #10b981;
-  --accent-foreground: #ffffff;
-  --destructive: #ef4444;
+  --secondary: var(--casino-secondary);
+  --secondary-foreground: var(--casino-light);
+  --accent: var(--casino-gold);
+  --accent-foreground: var(--casino-dark);
+  --destructive: var(--casino-red);
   --destructive-foreground: #ffffff;
-  --border: #374151;
-  --input: #1f2937;
-  --ring: #3b82f6;
+  --border: var(--casino-quaternary);
+  --input: var(--casino-tertiary);
+  --ring: var(--casino-primary);
+  
+  /* Casino specific colors */
+  --casino-gradient-start: var(--casino-dark);
+  --casino-gradient-end: var(--casino-primary);
+  --casino-card-bg: var(--casino-quaternary);
+  --casino-hover: var(--casino-tertiary);
 }
 
 @theme inline {
@@ -78,4 +103,67 @@ body {
 
 .animate-slide-in {
   animation: slideIn 0.3s ease-out;
+}
+
+/* Casino Theme Utility Classes */
+.bg-casino-primary { background-color: var(--casino-primary); }
+.bg-casino-secondary { background-color: var(--casino-secondary); }
+.bg-casino-tertiary { background-color: var(--casino-tertiary); }
+.bg-casino-quaternary { background-color: var(--casino-quaternary); }
+.bg-casino-dark { background-color: var(--casino-dark); }
+.bg-casino-red { background-color: var(--casino-red); }
+.bg-casino-pink { background-color: var(--casino-pink); }
+.bg-casino-cyan { background-color: var(--casino-cyan); }
+.bg-casino-gold { background-color: var(--casino-gold); }
+.bg-casino-light { background-color: var(--casino-light); }
+
+.text-casino-primary { color: var(--casino-primary); }
+.text-casino-secondary { color: var(--casino-secondary); }
+.text-casino-tertiary { color: var(--casino-tertiary); }
+.text-casino-quaternary { color: var(--casino-quaternary); }
+.text-casino-dark { color: var(--casino-dark); }
+.text-casino-red { color: var(--casino-red); }
+.text-casino-pink { color: var(--casino-pink); }
+.text-casino-cyan { color: var(--casino-cyan); }
+.text-casino-gold { color: var(--casino-gold); }
+.text-casino-light { color: var(--casino-light); }
+
+.border-casino-primary { border-color: var(--casino-primary); }
+.border-casino-secondary { border-color: var(--casino-secondary); }
+.border-casino-tertiary { border-color: var(--casino-tertiary); }
+.border-casino-quaternary { border-color: var(--casino-quaternary); }
+.border-casino-gold { border-color: var(--casino-gold); }
+
+/* Casino Gradients */
+.bg-casino-gradient {
+  background: linear-gradient(135deg, var(--casino-gradient-start) 0%, var(--casino-gradient-end) 100%);
+}
+
+.bg-casino-card {
+  background: var(--casino-card-bg);
+  border: 1px solid var(--casino-quaternary);
+}
+
+.hover\:bg-casino-hover:hover {
+  background-color: var(--casino-hover);
+}
+
+/* Casino Glass Effect */
+.casino-glass {
+  background: rgba(26, 32, 64, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(55, 71, 166, 0.3);
+}
+
+/* Casino Glow Effects */
+.casino-glow {
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+}
+
+.casino-glow-primary {
+  box-shadow: 0 0 20px rgba(55, 71, 166, 0.4);
+}
+
+.casino-glow-red {
+  box-shadow: 0 0 20px rgba(166, 3, 33, 0.4);
 }

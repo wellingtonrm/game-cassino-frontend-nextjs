@@ -55,25 +55,27 @@ export default function Home() {
   ];
 
   return (
-    <section className="space-y-6">
-      {/* Dashboard Cards */}
-      <DashboardCards topPlayers={topPlayers} />
+    <div className="container mx-auto px-4 py-8">
+      <section className="space-y-6">
+        {/* Dashboard Cards */}
+        <DashboardCards topPlayers={topPlayers} />
 
-      {/* Main Dashboard Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Top Leaders */}
-        <div className="lg:col-span-1">
-          <TopLeaders players={topPlayers} />
-        </div>
+        {/* Main Dashboard Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Top Leaders */}
+          <div className="lg:col-span-1">
+            <TopLeaders players={topPlayers} />
+          </div>
 
-        {/* Live Feed */}
-        <div className="lg:col-span-2">
-          <LiveFeed feedItems={liveFeed} />
+          {/* Live Feed */}
+          <div className="lg:col-span-2">
+            <LiveFeed feedItems={liveFeed} />
+          </div>
         </div>
-      </div>
-      
-      {/* Promotional Banner */}
-      <PromotionalBanner />
-    </section>
+        
+        {/* Promotional Banner */}
+        <PromotionalBanner />
+      </section>
+    </div>
   );
 }

@@ -5,9 +5,27 @@ export class PlinkoScene extends Phaser.Scene {
   private onBallDrop: () => void;
   private betAmount: number;
   
+  // Configurações físicas da bola - ajuste estes valores para controlar o comportamento
+  private ballPhysics = {
+    // Restituição: quão "elástica" é a bola (0 = não quica, 1 = quica perfeitamente)
+    // Valores menores = menos quique, mais realista
+    restitution: 0.5,  // Reduzido de 0.85 para menos quique
+    
+    // Atrito: resistência ao movimento quando em contato com superfícies
+    // Valores maiores = mais lento, menos deslizamento
+    friction: 0.08,     // Aumentado de 0.05 para mais atrito
+    
+    // Atrito do ar: resistência ao movimento no ar
+    // Valores maiores = bola mais pesada, cai mais devagar
+    frictionAir: 0.004, // Aumentado de 0.008 para bola mais pesada
+    
+    // Densidade: peso da bola (valores maiores = mais pesada)
+    density: 0.04       // Adicionado para controlar o peso
+  };
+  
   // Game objects
-  private balls: Phaser.GameObjects.Image[] = [];
-  private pegs: Phaser.GameObjects.Container[] = [];
+  private balls: Phaser.GameObjects.Arc[] = [];
+  private pegs: Phaser.GameObjects.Arc[] = [];
   private multipliers: {
     zone: Phaser.Types.Physics.Matter.MatterBody;
     value: number;
@@ -18,6 +36,9 @@ export class PlinkoScene extends Phaser.Scene {
   // Visual elements
   private backgroundGradient!: Phaser.GameObjects.Graphics;
   private titleContainer!: Phaser.GameObjects.Container;
+  private ballLauncher!: Phaser.GameObjects.Container;
+  private soundEnabled: boolean = true;
+  private soundToggleButton!: Phaser.GameObjects.Container;
   
   constructor(onBallComplete: (multiplier: number) => void, onBallDrop: () => void, betAmount: number) {
     super({ key: 'PlinkoScene' });
@@ -33,11 +54,14 @@ export class PlinkoScene extends Phaser.Scene {
   }
 
   create() {
-    // Create professional gradient background
+    // Create clean background
     this.createBackground();
     
-    // Create elegant title with effects
-    this.createTitle();
+    // Create ball launcher
+    this.createBallLauncher();
+    
+    // Create sound toggle button
+    this.createSoundToggle();
     
     // Create game boundaries
     this.createBoundaries();
@@ -55,140 +79,241 @@ export class PlinkoScene extends Phaser.Scene {
   private createBackground() {
     this.backgroundGradient = this.add.graphics();
     
-    // Create sophisticated gradient background using fillGradientStyle
-    this.backgroundGradient.fillGradientStyle(0x0f1419, 0x0f1419, 0x2d1b69, 0x2d1b69);
+    // Clean solid background
+    this.backgroundGradient.fillStyle(0x1a1a2e);
     this.backgroundGradient.fillRect(0, 0, 800, 600);
-    
-    // Add subtle pattern overlay
-    for (let i = 0; i < 50; i++) {
-      const x = Math.random() * 800;
-      const y = Math.random() * 600;
-      const star = this.add.circle(x, y, 1, 0x6366f1, 0.3);
-      star.setBlendMode(Phaser.BlendModes.ADD);
-    }
   }
-  
-  private createTitle() {
-    this.titleContainer = this.add.container(400, 40);
+
+  private createBallLauncher() {
+    // Container para o lançador
+    this.ballLauncher = this.add.container(400, 30);
     
-    // Main title with premium styling
-    const titleText = this.add.text(0, 0, 'PLINKO PREMIUM', {
-      fontFamily: 'Arial Black',
-      fontSize: '32px',
-      color: '#fbbf24',
-      stroke: '#92400e',
-      strokeThickness: 2,
-      shadow: {
-        offsetX: 2,
-        offsetY: 2,
-        color: '#000000',
-        blur: 4,
-        fill: true
+    // Base do canhão
+    const cannonBase = this.add.graphics();
+    cannonBase.fillStyle(0x444444);
+    cannonBase.fillRect(-25, -10, 50, 20);
+    
+    // Tubo do canhão
+    const cannonBarrel = this.add.graphics();
+    cannonBarrel.fillStyle(0x666666);
+    cannonBarrel.fillRect(-8, -25, 16, 30);
+    
+    // Detalhe decorativo
+    const cannonTip = this.add.graphics();
+    cannonTip.fillStyle(0x888888);
+    cannonTip.fillRect(-6, -28, 12, 8);
+    
+    // Adicionar elementos ao container
+    this.ballLauncher.add([cannonBase, cannonBarrel, cannonTip]);
+    
+    // Definir profundidade
+     this.ballLauncher.setDepth(2);
+   }
+
+   private createSoundToggle() {
+     // Container para o botão de som
+     this.soundToggleButton = this.add.container(750, 50);
+     
+     // Fundo mágico do botão
+     const buttonBg = this.add.graphics();
+     buttonBg.fillGradientStyle(0x4a0e4e, 0x81007f, 0x4a0e4e, 0x81007f);
+     buttonBg.fillCircle(0, 0, 25);
+     
+     // Borda brilhante
+     const buttonBorder = this.add.graphics();
+     buttonBorder.lineStyle(3, 0xffffff, 0.8);
+     buttonBorder.strokeCircle(0, 0, 25);
+     
+     // Brilho mágico
+     const magicGlow = this.add.graphics();
+     magicGlow.fillStyle(0xffffff, 0.3);
+     magicGlow.fillCircle(0, -8, 15);
+     
+     // Ícone de som (ondas sonoras)
+     const soundWaves = this.add.graphics();
+     this.updateSoundIcon(soundWaves);
+     
+     // Adicionar elementos ao container
+     this.soundToggleButton.add([buttonBg, magicGlow, buttonBorder, soundWaves]);
+     
+     // Tornar interativo
+     this.soundToggleButton.setSize(50, 50);
+     this.soundToggleButton.setInteractive();
+     
+     // Evento de clique
+     this.soundToggleButton.on('pointerdown', () => {
+       this.soundEnabled = !this.soundEnabled;
+       this.updateSoundIcon(soundWaves);
+       
+       // Efeito de clique
+       this.tweens.add({
+         targets: this.soundToggleButton,
+         scaleX: 0.9,
+         scaleY: 0.9,
+         duration: 100,
+         yoyo: true
+       });
+     });
+     
+     // Efeito hover
+     this.soundToggleButton.on('pointerover', () => {
+       this.tweens.add({
+         targets: this.soundToggleButton,
+         scaleX: 1.1,
+         scaleY: 1.1,
+         duration: 200
+       });
+     });
+     
+     this.soundToggleButton.on('pointerout', () => {
+       this.tweens.add({
+         targets: this.soundToggleButton,
+         scaleX: 1,
+         scaleY: 1,
+         duration: 200
+       });
+     });
+     
+     // Definir profundidade
+     this.soundToggleButton.setDepth(3);
+   }
+
+    private playLaunchSound() {
+      if (!this.soundEnabled) return;
+      
+      try {
+        // Criar contexto de áudio para som de lançamento
+        const audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.3);
+        
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.3);
+      } catch (error) {
+        console.log('Audio not supported');
       }
-    }).setOrigin(0.5);
-    
-    // Glow effect
-    const glow = this.add.text(0, 0, 'PLINKO PREMIUM', {
-      fontFamily: 'Arial Black',
-      fontSize: '32px',
-      color: '#fbbf24'
-    }).setOrigin(0.5);
-    glow.setScale(1.1);
-    glow.setAlpha(0.5);
-    glow.setBlendMode(Phaser.BlendModes.ADD);
-    
-    this.titleContainer.add([glow, titleText]);
-    
-    // Pulsing animation
-    this.tweens.add({
-      targets: this.titleContainer,
-      scaleX: 1.05,
-      scaleY: 1.05,
-      duration: 2000,
-      yoyo: true,
-      repeat: -1,
-      ease: 'Sine.easeInOut'
-    });
-  }
+    }
+
+    private playMultiplierSound(multiplier: number) {
+      if (!this.soundEnabled) return;
+      
+      try {
+        // Som diferente baseado no valor do multiplicador
+        const audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        // Frequência baseada no multiplicador
+        const baseFreq = multiplier >= 10 ? 1000 : multiplier >= 5 ? 800 : multiplier >= 2 ? 600 : 400;
+        
+        oscillator.frequency.setValueAtTime(baseFreq, audioContext.currentTime);
+        oscillator.frequency.setValueAtTime(baseFreq * 1.5, audioContext.currentTime + 0.1);
+        oscillator.frequency.setValueAtTime(baseFreq, audioContext.currentTime + 0.2);
+        
+        gainNode.gain.setValueAtTime(0.4, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.4);
+      } catch (error) {
+        console.log('Audio not supported');
+      }
+    }
+
+   private updateSoundIcon(graphics: Phaser.GameObjects.Graphics) {
+     graphics.clear();
+     
+     if (this.soundEnabled) {
+       // Ícone de som ligado (ondas sonoras)
+       graphics.lineStyle(3, 0xffffff, 1);
+       graphics.strokeCircle(-5, 0, 8);
+       graphics.strokeCircle(-5, 0, 12);
+       graphics.strokeCircle(-5, 0, 16);
+       
+       // Alto-falante
+       graphics.fillStyle(0xffffff);
+       graphics.fillRect(-15, -8, 8, 16);
+       graphics.fillTriangle(-7, -5, -7, 5, 2, 8);
+       graphics.fillTriangle(-7, -5, -7, 5, 2, -8);
+     } else {
+       // Ícone de som desligado (X sobre o alto-falante)
+       graphics.fillStyle(0xff4444);
+       graphics.fillRect(-15, -8, 8, 16);
+       graphics.fillTriangle(-7, -5, -7, 5, 2, 8);
+       graphics.fillTriangle(-7, -5, -7, 5, 2, -8);
+       
+       // X vermelho
+       graphics.lineStyle(4, 0xff0000, 1);
+       graphics.beginPath();
+       graphics.moveTo(5, -10);
+       graphics.lineTo(15, 10);
+       graphics.moveTo(15, -10);
+       graphics.lineTo(5, 10);
+       graphics.strokePath();
+     }
+   }
+  
+
   
   private createBoundaries() {
-    // Invisible physics boundaries
+    // Invisible physics boundaries only
     this.matter.add.rectangle(0, 300, 20, 600, { isStatic: true });
     this.matter.add.rectangle(800, 300, 20, 600, { isStatic: true });
     this.matter.add.rectangle(400, 600, 800, 20, { isStatic: true });
-    
-    // Visual side walls
-    const leftWall = this.add.graphics();
-    leftWall.fillGradientStyle(0x4338ca, 0x4338ca, 0x1e1b4b, 0x1e1b4b);
-    leftWall.fillRect(0, 0, 10, 600);
-    
-    const rightWall = this.add.graphics();
-    rightWall.fillGradientStyle(0x4338ca, 0x4338ca, 0x1e1b4b, 0x1e1b4b);
-    rightWall.fillRect(790, 0, 10, 600);
   }
   
   private createProfessionalPegs() {
-    const pegRadius = 8;
-    const rows = 12;
-    const startY = 100;
-    const rowSpacing = 45;
+    const pegRadius = 6; // Reduzido apenas o tamanho
+    const rows = 12; // Mantendo todas as 12 fileiras
+    const startY = 60; // Posição inicial mais alta
+    const rowSpacing = 30; // Espaçamento menor entre fileiras
     
     for (let row = 0; row < rows; row++) {
       const pegsInRow = row + 3;
-      const totalWidth = (pegsInRow - 1) * 65;
+      const totalWidth = (pegsInRow - 1) * 45; // Reduzido de 62 para 45
       const startX = 400 - totalWidth / 2;
       
       for (let col = 0; col < pegsInRow; col++) {
-        const x = startX + col * 65;
+        const x = startX + col * 45; // Reduzido de 62 para 45
         const y = startY + row * rowSpacing;
         
         // Physics body
         this.matter.add.circle(x, y, pegRadius, {
            isStatic: true,
-           restitution: 0.9,
-           friction: 0.1
+           restitution: 0.95,
+           friction: 0.05
          });
         
-        // Visual container
-        const pegContainer = this.add.container(x, y);
+        // Simple visual peg
+        const peg = this.add.circle(x, y, pegRadius, 0xffffff);
         
-        // Outer glow
-        const outerGlow = this.add.circle(0, 0, pegRadius + 4, 0x6366f1, 0.3);
-        outerGlow.setBlendMode(Phaser.BlendModes.ADD);
+        // Definir profundidade neutra
+        peg.setDepth(0);
         
-        // Main peg with gradient effect
-        const pegGraphics = this.add.graphics();
-        pegGraphics.fillGradientStyle(0xfbbf24, 0xfbbf24, 0xd97706, 0xd97706);
-        pegGraphics.fillCircle(0, 0, pegRadius);
-        
-        // Highlight
-        const highlight = this.add.circle(-2, -2, 3, 0xffffff, 0.6);
-        
-        // Border
-        const border = this.add.circle(0, 0, pegRadius);
-        border.setStrokeStyle(2, 0x92400e, 0.8);
-        
-        pegContainer.add([outerGlow, pegGraphics, highlight, border]);
-        this.pegs.push(pegContainer);
-        
-        // Subtle floating animation
-        this.tweens.add({
-          targets: pegContainer,
-          y: y + 2,
-          duration: 3000 + Math.random() * 2000,
-          yoyo: true,
-          repeat: -1,
-          ease: 'Sine.easeInOut'
-        });
+        this.pegs.push(peg);
       }
     }
   }
 
   private createPremiumMultiplierZones() {
-    const zoneWidth = 55;
-    const zoneHeight = 70;
-    const zoneY = 540;
-    const multiplierValues = [0.2, 0.5, 1.0, 1.5, 2.0, 3.0, 5.0, 10.0, 5.0, 3.0, 2.0, 1.5, 1.0, 0.5, 0.2];
+    const zoneWidth = 42; // Reduzido para melhor proporção
+    const zoneHeight = 50; // Altura proporcional
+    
+    // Posicionar multiplicadores mais próximos dos pinos
+    const zoneY = 450; // Posição mais próxima dos pinos
+    const multiplierValues = [2.0, 1.9, 1.5, 1.2, 1.0, 0.9, 0.5, 0.2, 0.5, 0.9, 1.0, 1.2, 1.5, 1.9, 2.0];
     
     const totalZones = multiplierValues.length;
     const totalWidth = totalZones * zoneWidth;
@@ -197,65 +322,96 @@ export class PlinkoScene extends Phaser.Scene {
     multiplierValues.forEach((value, index) => {
       const x = startX + index * zoneWidth + zoneWidth / 2;
       
-      // Physics zone
-      const zone = this.matter.add.rectangle(x, zoneY, zoneWidth - 4, zoneHeight, {
+      // Criar física de pote real com paredes sólidas
+       const wallThickness = 3;
+       
+       // Parede esquerda
+       this.matter.add.rectangle(
+         x - zoneWidth/2 + wallThickness/2, 
+         zoneY, 
+         wallThickness, 
+         zoneHeight, 
+         { isStatic: true }
+       );
+       
+       // Parede direita
+       this.matter.add.rectangle(
+         x + zoneWidth/2 - wallThickness/2, 
+         zoneY, 
+         wallThickness, 
+         zoneHeight, 
+         { isStatic: true }
+       );
+       
+       // Fundo do pote
+       this.matter.add.rectangle(
+         x, 
+         zoneY + zoneHeight/2 - wallThickness/2, 
+         zoneWidth, 
+         wallThickness, 
+         { isStatic: true }
+       );
+      
+      // Zona de sensor para detectar quando a bola entra no pote
+      const zone = this.matter.add.rectangle(x, zoneY - 10, zoneWidth - 6, 20, {
         isStatic: true,
         isSensor: true
       });
       
-      // Visual container
+      // Simple visual container
       const container = this.add.container(x, zoneY);
       
-      // Determine colors based on multiplier value
-      let bgColor, textColor, glowColor;
-      if (value >= 10) {
-        bgColor = [0xff0000, 0x8b0000]; // Red gradient for highest
+      // Simple color scheme
+      let bgColor, textColor;
+      if (value >= 2.0) {
+        bgColor = 0xff0000; // Red for highest (2.0x)
         textColor = '#ffffff';
-        glowColor = 0xff0000;
-      } else if (value >= 5) {
-        bgColor = [0xffa500, 0xff6600]; // Orange gradient for high
+      } else if (value >= 1.5) {
+        bgColor = 0xff6600; // Orange for high (1.9x, 1.5x)
         textColor = '#ffffff';
-        glowColor = 0xffa500;
-      } else if (value >= 2) {
-        bgColor = [0xffd700, 0xffa500]; // Gold gradient for medium-high
+      } else if (value >= 1.0) {
+        bgColor = 0xffff00; // Yellow for medium-high (1.2x, 1.0x)
         textColor = '#000000';
-        glowColor = 0xffd700;
-      } else if (value >= 1) {
-        bgColor = [0x32cd32, 0x228b22]; // Green gradient for medium
-        textColor = '#ffffff';
-        glowColor = 0x32cd32;
+      } else if (value >= 0.5) {
+        bgColor = 0x00ff00; // Green for medium (0.9x, 0.5x)
+        textColor = '#000000';
       } else {
-        bgColor = [0x4169e1, 0x191970]; // Blue gradient for low
+        bgColor = 0x0066ff; // Blue for lowest (0.2x)
         textColor = '#ffffff';
-        glowColor = 0x4169e1;
       }
       
-      // Background with gradient
+      // Fundo do pote com gradiente
       const background = this.add.graphics();
-      background.fillGradientStyle(bgColor[0], bgColor[0], bgColor[1], bgColor[1]);
-      background.fillRoundedRect(-zoneWidth/2 + 2, -zoneHeight/2 + 2, zoneWidth - 4, zoneHeight - 4, 8);
+      background.fillGradientStyle(bgColor, bgColor, 0x000000, 0x000000, 0.8);
+      background.fillRoundedRect(-zoneWidth/2, -zoneHeight/2, zoneWidth, zoneHeight, 8);
       
-      // Glow effect
-      const glow = this.add.graphics();
-      glow.fillStyle(glowColor, 0.3);
-      glow.fillRoundedRect(-zoneWidth/2, -zoneHeight/2, zoneWidth, zoneHeight, 10);
-      glow.setBlendMode(Phaser.BlendModes.ADD);
-      
-      // Border
+      // Borda do pote
       const border = this.add.graphics();
-      border.lineStyle(2, 0xffffff, 0.8);
-      border.strokeRoundedRect(-zoneWidth/2 + 2, -zoneHeight/2 + 2, zoneWidth - 4, zoneHeight - 4, 8);
+      border.lineStyle(3, 0xffffff, 0.8);
+      border.strokeRoundedRect(-zoneWidth/2, -zoneHeight/2, zoneWidth, zoneHeight, 8);
       
-      // Multiplier text
-      const text = this.add.text(0, 0, `${value}x`, {
+      // Brilho interno
+      const innerGlow = this.add.graphics();
+      innerGlow.fillStyle(0xffffff, 0.2);
+      innerGlow.fillRoundedRect(-zoneWidth/2 + 2, -zoneHeight/2 + 2, zoneWidth - 4, zoneHeight/3, 6);
+      
+      // Texto com sombra
+      const textShadow = this.add.text(1, 1, `${value}x`, {
         fontFamily: 'Arial Black',
-        fontSize: value >= 10 ? '16px' : '14px',
-        color: textColor,
-        stroke: value >= 1 ? '#000000' : '#ffffff',
-        strokeThickness: 1
+        fontSize: '16px',
+        color: '#000000'
       }).setOrigin(0.5);
       
-      container.add([glow, background, border, text]);
+      const text = this.add.text(0, 0, `${value}x`, {
+        fontFamily: 'Arial Black',
+        fontSize: '16px',
+        color: textColor
+      }).setOrigin(0.5);
+      
+      container.add([background, border, innerGlow, textShadow, text]);
+      
+      // Definir profundidade para ficar visível
+      container.setDepth(1);
       
       this.multipliers.push({
         zone,
@@ -263,19 +419,6 @@ export class PlinkoScene extends Phaser.Scene {
         container,
         text
       });
-      
-      // Subtle pulsing for high-value zones
-      if (value >= 5) {
-        this.tweens.add({
-          targets: container,
-          scaleX: 1.1,
-          scaleY: 1.1,
-          duration: 1500,
-          yoyo: true,
-          repeat: -1,
-          ease: 'Sine.easeInOut'
-        });
-      }
     });
   }
 
@@ -290,6 +433,11 @@ export class PlinkoScene extends Phaser.Scene {
         const multiplier = this.multipliers.find(m => m.zone === bodyA || m.zone === bodyB);
         
         if (ball && multiplier) {
+          // Efeito sonoro do multiplicador
+          if (this.soundEnabled) {
+            this.playMultiplierSound(multiplier.value);
+          }
+          
           // Animate the winning zone
           this.tweens.add({
             targets: multiplier.container,
@@ -328,60 +476,38 @@ export class PlinkoScene extends Phaser.Scene {
   dropBall() {
     this.onBallDrop();
     
-    // Create ball at random position at top
-    const x = 350 + Math.random() * 100;
-    const y = 80;
+    // Criar bola em posição aleatória no topo
+    const x = 360 + Math.random() * 80;
+    const y = 75;
     
-    // Create ball with premium visual effects
-    const ballContainer = this.add.container(x, y);
+    // Efeito sonoro de lançamento
+    if (this.soundEnabled) {
+      // Simular som de lançamento com oscilador
+      this.playLaunchSound();
+    }
     
-    // Outer glow
-    const outerGlow = this.add.circle(0, 0, 12, 0x00ffff, 0.5);
-    outerGlow.setBlendMode(Phaser.BlendModes.ADD);
+    // Criar bola visual simples
+    const ball = this.add.circle(x, y, 8, 0xffffff);
     
-    // Main ball with gradient
-    const ballGraphics = this.add.graphics();
-    ballGraphics.fillGradientStyle(0xffffff, 0xffffff, 0xcccccc, 0xcccccc);
-    ballGraphics.fillCircle(0, 0, 8);
+    // Definir profundidade para ficar na frente das zonas de multiplicadores
+    ball.setDepth(1);
     
-    // Highlight
-    const highlight = this.add.circle(-2, -2, 3, 0xffffff, 0.8);
-    
-    // Border
-    const border = this.add.circle(0, 0, 8);
-    border.setStrokeStyle(1, 0x666666, 0.8);
-    
-    ballContainer.add([outerGlow, ballGraphics, highlight, border]);
-    
-    // Create physics body
+    // Criar corpo físico da bola usando as configurações definidas
     const ballBody = this.matter.add.circle(x, y, 8, {
-      restitution: 0.8,
-      friction: 0.1,
-      frictionAir: 0.01
+      restitution: this.ballPhysics.restitution,   // Controla o quique
+      friction: this.ballPhysics.friction,         // Controla o atrito com superfícies
+      frictionAir: this.ballPhysics.frictionAir,   // Controla a resistência do ar (peso)
+      density: this.ballPhysics.density            // Controla a densidade/massa da bola
     });
 
-    // Create invisible image to link physics and visual
-    const ball = this.add.image(x, y, '') as Phaser.GameObjects.Image;
+    // Conectar física e visual
     this.matter.add.gameObject(ball, ballBody);
     ball.setData('isBall', true);
-    ball.setData('container', ballContainer);
-
-    // Update visual position to match physics in the update loop
-    // The collision detection will be handled in the existing collision event system
     
     this.balls.push(ball);
-    
-    // Store ball reference for cleanup
-    ball.setData('ballContainer', ballContainer);
   }
 
   update() {
-    // Update visual positions to match physics bodies
-    this.balls.forEach(ball => {
-      const container = ball.getData('container') as Phaser.GameObjects.Container;
-      if (container && ball.body) {
-        container.setPosition(ball.x, ball.y);
-      }
-    });
+    // Simple update - physics handles ball movement automatically
   }
 }
