@@ -9,18 +9,18 @@ export class PlinkoScene extends Phaser.Scene {
   private ballPhysics = {
     // Restituição: quão "elástica" é a bola (0 = não quica, 1 = quica perfeitamente)
     // Valores menores = menos quique, mais realista
-    restitution: 0.5,  // Reduzido de 0.85 para menos quique
+    restitution: 1,  // Reduzido de 0.85 para menos quique
     
     // Atrito: resistência ao movimento quando em contato com superfícies
     // Valores maiores = mais lento, menos deslizamento
-    friction: 0.08,     // Aumentado de 0.05 para mais atrito
+    friction: 0.01,     // Aumentado de 0.05 para mais atrito
     
     // Atrito do ar: resistência ao movimento no ar
     // Valores maiores = bola mais pesada, cai mais devagar
-    frictionAir: 0.004, // Aumentado de 0.008 para bola mais pesada
+    frictionAir: 0.008, // Aumentado de 0.008 para bola mais pesada
     
     // Densidade: peso da bola (valores maiores = mais pesada)
-    density: 0.04       // Adicionado para controlar o peso
+    density: 0.01      // Adicionado para controlar o peso
   };
   
   // Game objects
@@ -276,17 +276,17 @@ export class PlinkoScene extends Phaser.Scene {
   
   private createProfessionalPegs() {
     const pegRadius = 6; // Reduzido apenas o tamanho
-    const rows = 12; // Mantendo todas as 12 fileiras
+    const rows = 15; // Aumentado para 15 fileiras para ter 17 pinos na base
     const startY = 60; // Posição inicial mais alta
-    const rowSpacing = 30; // Espaçamento menor entre fileiras
+    const rowSpacing = 25; // Espaçamento reduzido para caber mais fileiras
     
     for (let row = 0; row < rows; row++) {
       const pegsInRow = row + 3;
-      const totalWidth = (pegsInRow - 1) * 45; // Reduzido de 62 para 45
+      const totalWidth = (pegsInRow - 1) * 42; // Reduzido para 42 para caber 17 pinos
       const startX = 400 - totalWidth / 2;
       
       for (let col = 0; col < pegsInRow; col++) {
-        const x = startX + col * 45; // Reduzido de 62 para 45
+        const x = startX + col * 42; // Ajustado para 42 para corresponder às caixas
         const y = startY + row * rowSpacing;
         
         // Physics body
@@ -313,7 +313,7 @@ export class PlinkoScene extends Phaser.Scene {
     
     // Posicionar multiplicadores mais próximos dos pinos
     const zoneY = 450; // Posição mais próxima dos pinos
-    const multiplierValues = [2.0, 1.9, 1.5, 1.2, 1.0, 0.9, 0.5, 0.2, 0.5, 0.9, 1.0, 1.2, 1.5, 1.9, 2.0];
+    const multiplierValues = [2.5, 2.0, 1.9, 1.5, 1.2, 1.0, 0.9, 0.5, 0.2, 0.5, 0.9, 1.0, 1.2, 1.5, 1.9, 2.0, 2.5];
     
     const totalZones = multiplierValues.length;
     const totalWidth = totalZones * zoneWidth;
@@ -363,8 +363,11 @@ export class PlinkoScene extends Phaser.Scene {
       
       // Simple color scheme
       let bgColor, textColor;
-      if (value >= 2.0) {
-        bgColor = 0xff0000; // Red for highest (2.0x)
+      if (value >= 2.5) {
+        bgColor = 0x8b0000; // Dark red for highest (2.5x)
+        textColor = '#ffffff';
+      } else if (value >= 2.0) {
+        bgColor = 0xff0000; // Red for high (2.0x)
         textColor = '#ffffff';
       } else if (value >= 1.5) {
         bgColor = 0xff6600; // Orange for high (1.9x, 1.5x)
