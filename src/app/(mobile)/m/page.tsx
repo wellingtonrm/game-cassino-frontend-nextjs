@@ -12,15 +12,6 @@ import Logo from '@/components/Logo'
 import { useNavigationStore, type NavigationTab } from '@/stores/navigationStore'
 
 // Types
-interface GameStats {
-  id: string
-  username: string
-  bet: number
-  multiplier: number
-  payout: number
-  time: string
-}
-
 interface PlinkoSettings {
   mode: 'manual' | 'auto'
   betAmount: number
@@ -302,7 +293,7 @@ type RippleButtonProps = {
 const RippleButton = ({ children, onClick, className, ...props }: RippleButtonProps) => {
   const [ripples, setRipples] = useState<Array<{ x: number; y: number; id: number }>>([])
 
-  const addRipple = (event: React.MouseEvent) => {
+  const addRipple = (event: React.MouseEvent<HTMLButtonElement>) => {
     const rect = event.currentTarget.getBoundingClientRect()
     const x = event.clientX - rect.left
     const y = event.clientY - rect.top
@@ -314,7 +305,9 @@ const RippleButton = ({ children, onClick, className, ...props }: RippleButtonPr
       setRipples(prev => prev.filter(ripple => ripple.id !== id))
     }, 600)
     
-    onClick?.(event)
+    if (onClick) {
+      onClick(event)
+    }
   }
 
   return (
