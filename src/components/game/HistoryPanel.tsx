@@ -1,22 +1,29 @@
 'use client';
 
+import React from 'react';
 import { Clock, TrendingUp, TrendingDown, History, Trophy } from 'lucide-react';
+import { usePlinkoStore } from '@/stores/plinkoStore';
+import { cn } from '@/lib/utils';
 
-interface GameResult {
-  id: string;
-  betAmount: number;
-  multiplier: number;
-  winAmount: number;
-  timestamp: Date;
-}
+/**
+ * HistoryPanel Component
+ * 
+ * Displays game history with statistics using Zustand store.
+ * Follows Material You design principles for consistency.
+ */
+export const HistoryPanel: React.FC = () => {
+  const { history, getStats } = usePlinkoStore();
+  const [isClient, setIsClient] = React.useState(false);
+  
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
+  
+  const stats = getStats();
 
-interface HistoryPanelProps {
-  gameHistory: GameResult[];
-}
-
-export function HistoryPanel({ gameHistory }: HistoryPanelProps) {
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('pt-BR', {
+  const formatTime = (date: Date | string) => {
+    const dateObj = date instanceof Date ? date : new Date(date);
+    return dateObj.toLocaleTimeString('pt-BR', {
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit'
@@ -24,118 +31,121 @@ export function HistoryPanel({ gameHistory }: HistoryPanelProps) {
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-      minimumFractionDigits: 2
-    }).format(amount);
+    return amount.toFixed(6); // Match the balance format
   };
 
-  const getResultColor = (winAmount: number, betAmount: number) => {
-    if (winAmount > betAmount) return 'text-casino-gold';
-    if (winAmount < betAmount) return 'text-casino-red';
-    return 'text-casino-cyan';
+  const getResultColor = (payout: number, betAmount: number) => {
+    if (payout > betAmount) return 'text-green-400';
+    if (payout < betAmount) return 'text-red-400';
+    return 'text-blue-400';
   };
 
-  const getResultIcon = (winAmount: number, betAmount: number) => {
-    if (winAmount > betAmount) return <TrendingUp className="w-4 h-4 text-casino-gold" />;
-    if (winAmount < betAmount) return <TrendingDown className="w-4 h-4 text-casino-red" />;
-    return <div className="w-4 h-4 rounded-full bg-casino-cyan" />;
+  const getResultIcon = (payout: number, betAmount: number) => {
+    if (payout > betAmount) return <TrendingUp className="w-4 h-4 text-green-400" />;
+    if (payout < betAmount) return <TrendingDown className="w-4 h-4 text-red-400" />;
+    return <div className="w-4 h-4 rounded-full bg-blue-400" />;
   };
-
-  const totalWinnings = gameHistory.reduce((sum, game) => sum + (game.winAmount - game.betAmount), 0);
-  const totalGames = gameHistory.length;
-  const winRate = totalGames > 0 ? (gameHistory.filter(game => game.winAmount > game.betAmount).length / totalGames * 100) : 0;
 
   return (
-    <div className="casino-glass rounded-xl casino-glow-secondary p-6 space-y-4">
-      <div className="flex items-center space-x-3 mb-4">
-        <div className="w-8 h-8 bg-casino-gold rounded-lg flex items-center justify-center">
-          <History className="w-4 h-4 text-casino-dark" />
-        </div>
-        <h3 className="text-lg font-semibold text-casino-light">Histórico de Jogadas</h3>
+    <div className="bg-[#1a1a2e] border border-gray-700/50 rounded-lg mx-3 p-3">
+      <div className="flex items-center gap-2 mb-3">
+        <History className="w-5 h-5 text-purple-400" />
+        <h3 className="text-sm font-bold text-purple-400">Game History</h3>
+        <span className="text-xs text-gray-400">({history.length})</span>
       </div>
 
       {/* Statistics */}
-      {totalGames > 0 && (
-        <div className="casino-glass rounded-lg p-4 mb-4">
-          <div className="text-center mb-3">
-            <div className="flex items-center justify-center space-x-2 mb-1">
-              <Trophy className="w-4 h-4 text-casino-gold" />
-              <p className="text-xs text-casino-light/80 font-medium">Lucro Total</p>
+      {isClient && stats.totalGames > 0 && (
+        <div className="bg-[#2a2a3e] rounded-lg p-3 mb-3">
+          <div className="text-center mb-2">
+            <div className="flex items-center justify-center gap-1 mb-1">
+              <Trophy className="w-4 h-4 text-yellow-500" />
+              <p className="text-xs text-gray-400 font-medium">Net Profit</p>
             </div>
-            <p className={`text-lg font-bold ${
-              totalWinnings >= 0 ? 'text-casino-gold' : 'text-casino-red'
-            }`}>
-              {formatCurrency(totalWinnings)}
+            <p className={cn(
+              "text-lg font-bold",
+              stats.netProfit >= 0 ? 'text-green-400' : 'text-red-400'
+            )}>
+              {stats.netProfit >= 0 ? '+' : ''}{formatCurrency(stats.netProfit)}
             </p>
           </div>
           
-          <div className="grid grid-cols-2 gap-4">
-            <div className="text-center">
-              <p className="text-xs text-casino-light/60">Jogadas</p>
-              <p className="text-sm font-bold text-casino-light">{totalGames}</p>
+          <div className="grid grid-cols-3 gap-2 text-center">
+            <div>
+              <p className="text-xs text-gray-400">Games</p>
+              <p className="text-sm font-bold text-white">{stats.totalGames}</p>
             </div>
-            <div className="text-center">
-              <p className="text-xs text-casino-light/60">Taxa de Vitória</p>
-              <p className="text-sm font-bold text-casino-cyan">{winRate.toFixed(1)}%</p>
+            <div>
+              <p className="text-xs text-gray-400">Win Rate</p>
+              <p className="text-sm font-bold text-blue-400">{stats.winRate.toFixed(1)}%</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-400">Max Multi</p>
+              <p className="text-sm font-bold text-yellow-500">{stats.maxMultiplier.toFixed(1)}x</p>
             </div>
           </div>
         </div>
       )}
 
       {/* History List */}
-      <div className="space-y-2 max-h-80 overflow-y-auto">
-        {gameHistory.length === 0 ? (
-          <div className="text-center py-8">
-            <div className="w-16 h-16 mx-auto mb-4 bg-casino-quaternary/20 rounded-full flex items-center justify-center">
-              <Clock className="w-8 h-8 text-casino-light/40" />
+      <div className="space-y-2 max-h-60 overflow-y-auto">
+        {!isClient ? (
+          <div className="text-center py-6">
+            <div className="w-12 h-12 mx-auto mb-3 bg-gray-700/50 rounded-full flex items-center justify-center">
+              <Clock className="w-6 h-6 text-gray-500" />
             </div>
-            <p className="text-casino-light/60 text-sm">Nenhuma jogada ainda</p>
-            <p className="text-casino-light/40 text-xs mt-1">Faça sua primeira aposta para ver o histórico</p>
+            <p className="text-gray-400 text-sm">Loading...</p>
+          </div>
+        ) : history.length === 0 ? (
+          <div className="text-center py-6">
+            <div className="w-12 h-12 mx-auto mb-3 bg-gray-700/50 rounded-full flex items-center justify-center">
+              <Clock className="w-6 h-6 text-gray-500" />
+            </div>
+            <p className="text-gray-400 text-sm">No games yet</p>
+            <p className="text-gray-500 text-xs mt-1">Start playing to see your history</p>
           </div>
         ) : (
-          gameHistory.map((game) => {
-            const profit = game.winAmount - game.betAmount;
-            const isWin = profit > 0;
-            const isLoss = profit < 0;
+          history.slice(0, 10).map((game, index) => {
+            const profit = game.payout - game.betAmount;
             
             return (
               <div
-                key={game.id}
-                className="flex items-center justify-between p-3 casino-glass rounded-lg hover:bg-casino-quaternary/30 transition-all duration-200 border border-casino-quaternary/20"
+                key={index}
+                className="flex items-center justify-between p-2 bg-[#2a2a3e] rounded-lg border border-gray-600/30"
               >
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 rounded-lg bg-casino-quaternary/20 flex items-center justify-center">
-                    {getResultIcon(game.winAmount, game.betAmount)}
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded bg-gray-600/50 flex items-center justify-center">
+                    {getResultIcon(game.payout, game.betAmount)}
                   </div>
                   
                   <div>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm font-bold text-casino-light">
-                        {game.multiplier}x
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-bold text-white">
+                        {game.multiplier.toFixed(1)}x
                       </span>
-                      <span className="text-xs text-casino-light/60">
+                      <span className="text-xs text-gray-400">
                         {formatTime(game.timestamp)}
                       </span>
                     </div>
                     
-                    <div className="text-xs text-casino-light/60">
-                      Aposta: {formatCurrency(game.betAmount)}
+                    <div className="text-xs text-gray-500">
+                      Bet: {formatCurrency(game.betAmount)}
                     </div>
                   </div>
                 </div>
                 
                 <div className="text-right">
-                  <div className={`text-sm font-bold ${
-                    getResultColor(game.winAmount, game.betAmount)
-                  }`}>
-                    {formatCurrency(game.winAmount)}
+                  <div className={cn(
+                    "text-sm font-bold",
+                    getResultColor(game.payout, game.betAmount)
+                  )}>
+                    {formatCurrency(game.payout)}
                   </div>
                   
-                  <div className={`text-xs font-medium ${
-                    isWin ? 'text-casino-gold' : isLoss ? 'text-casino-red' : 'text-casino-cyan'
-                  }`}>
+                  <div className={cn(
+                    "text-xs font-medium",
+                    profit >= 0 ? 'text-green-400' : 'text-red-400'
+                  )}>
                     {profit >= 0 ? '+' : ''}{formatCurrency(profit)}
                   </div>
                 </div>
@@ -146,4 +156,4 @@ export function HistoryPanel({ gameHistory }: HistoryPanelProps) {
       </div>
     </div>
   );
-}
+};

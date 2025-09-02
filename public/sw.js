@@ -1,22 +1,31 @@
 const CACHE_NAME = 'online-casino-v1';
 const urlsToCache = [
   '/',
-  '/d',
-  '/m',
-  '/auth',
   '/manifest.json',
-  '/icons/icon-192x192.svg',
-  '/icons/icon-512x512.svg',
-  // Add other static resources as needed
+  // Only cache files that actually exist
+  // '/d',  // Commented out - may not exist
+  // '/m',  // Commented out - may not exist
+  // '/auth', // Commented out - may not exist
 ];
 
-// Install event - cache resources
+// Install event - cache resources with error handling
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
         console.log('Cache opened');
-        return cache.addAll(urlsToCache);
+        // Use Promise.allSettled to handle individual failures
+        return Promise.allSettled(
+          urlsToCache.map(url => 
+            cache.add(url).catch(err => {
+              console.warn(`Failed to cache ${url}:`, err);
+              return null;
+            })
+          )
+        );
+      })
+      .catch(err => {
+        console.error('Failed to open cache:', err);
       })
   );
   // Force the waiting service worker to become the active service worker
@@ -35,10 +44,11 @@ self.addEventListener('activate', (event) => {
           }
         })
       );
+    }).then(() => {
+      // Only claim clients if this service worker is becoming active
+      return self.clients.claim();
     })
   );
-  // Ensure the service worker takes control immediately
-  self.clients.claim();
 });
 
 // Fetch event - serve from cache, fallback to network

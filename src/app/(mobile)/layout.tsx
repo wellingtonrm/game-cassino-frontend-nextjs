@@ -1,26 +1,12 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "@/styles/globals.css";
-import { Providers } from "@/components/providers";
-import PWAInstaller from "@/components/PWAInstaller";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import type { Metadata, Viewport } from "next";
 
 export const metadata: Metadata = {
-  title: "Online Casino - Premium Mobile Games",
-  description: "Premium mobile casino games including Plinko, Slots, and more. Experience the thrill of casino gaming on your mobile device.",
-  keywords: "casino, plinko, slots, mobile, games, betting, premium",
-  authors: [{ name: "Online Casino" }],
-  creator: "Online Casino",
-  publisher: "Online Casino",
+  title: "Raspadinha Cassino - Jogos Premium",
+  description: "Aplicativo de cassino premium com jogos de Plinko, Slots, Roleta e Raspadinha. Experimente a emoção dos jogos de cassino em seu dispositivo móvel.",
+  keywords: "cassino, plinko, slots, roleta, raspadinha, jogos, apostas, premium",
+  authors: [{ name: "Raspadinha Cassino" }],
+  creator: "Raspadinha Cassino",
+  publisher: "Raspadinha Cassino",
   formatDetection: {
     email: false,
     address: false,
@@ -30,7 +16,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Online Casino",
+    title: "Raspadinha Cassino",
     startupImage: [
       {
         url: "/icons/icon-512x512.svg",
@@ -40,23 +26,23 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    siteName: "Online Casino",
-    title: "Online Casino - Premium Mobile Games",
-    description: "Premium mobile casino games including Plinko, Slots, and more.",
-    url: "https://online-casino.com",
+    siteName: "Raspadinha Cassino",
+    title: "Raspadinha Cassino - Jogos Premium",
+    description: "Aplicativo de cassino premium com jogos de Plinko, Slots, Roleta e Raspadinha.",
+    url: "https://raspadinha-cassino.com",
     images: [
       {
         url: "/icons/icon-512x512.svg",
         width: 512,
         height: 512,
-        alt: "Online Casino Logo",
+        alt: "Raspadinha Cassino Logo",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Online Casino - Premium Mobile Games",
-    description: "Premium mobile casino games including Plinko, Slots, and more.",
+    title: "Raspadinha Cassino - Jogos Premium",
+    description: "Aplicativo de cassino premium com jogos de Plinko, Slots, Roleta e Raspadinha.",
     images: ["/icons/icon-512x512.svg"],
   },
   viewport: {
@@ -67,14 +53,14 @@ export const metadata: Metadata = {
     viewportFit: "cover",
   },
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#121212" },
-    { media: "(prefers-color-scheme: dark)", color: "#121212" },
+    { media: "(prefers-color-scheme: light)", color: "#1a1a2e" },
+    { media: "(prefers-color-scheme: dark)", color: "#1a1a2e" },
   ],
   other: {
     "mobile-web-app-capable": "yes",
     "apple-mobile-web-app-capable": "yes",
     "apple-mobile-web-app-status-bar-style": "black-translucent",
-    "msapplication-TileColor": "#121212",
+    "msapplication-TileColor": "#1a1a2e",
     "msapplication-config": "/browserconfig.xml",
   },
 };
@@ -85,9 +71,6 @@ export default function MobileRootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <Providers>
-      {children}
-      <PWAInstaller />
-    </Providers>
+      children
   );
 }
