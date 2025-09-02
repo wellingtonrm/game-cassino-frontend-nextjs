@@ -61,10 +61,14 @@ export const PlinkoCanvas = forwardRef<PlinkoCanvasRef, PlinkoCanvasProps>(({
     const initMatterEngine = () => {
       console.log('Initializing Matter.js engine...');
       
-      // Create Matter.js engine with more natural physics
+      // Create Matter.js engine with natural physics
       const engine = Matter.Engine.create();
-      engine.world.gravity.y = 0.35; // Even lighter gravity for smoother fall
-      engine.world.gravity.x = (Math.random() - 0.5) * 0.01; // Minimal horizontal variation
+      engine.world.gravity.y = 0.8; // More natural gravity
+      engine.world.gravity.x = 0;
+      
+      // Standard engine timing
+      engine.timing.timeScale = 1;
+      
       engineRef.current = engine;
       
       console.log('Matter.js engine created:', engine);
@@ -72,11 +76,20 @@ export const PlinkoCanvas = forwardRef<PlinkoCanvasRef, PlinkoCanvasProps>(({
       // Create world boundaries
       const walls = [
           // Left wall
-          Matter.Bodies.rectangle(-10, CANVAS_HEIGHT / 2, 20, CANVAS_HEIGHT, { isStatic: true }),
+          Matter.Bodies.rectangle(-10, CANVAS_HEIGHT / 2, 20, CANVAS_HEIGHT, { 
+            isStatic: true,
+            label: 'wall'
+          }),
           // Right wall  
-          Matter.Bodies.rectangle(CANVAS_WIDTH + 10, CANVAS_HEIGHT / 2, 20, CANVAS_HEIGHT, { isStatic: true }),
+          Matter.Bodies.rectangle(CANVAS_WIDTH + 10, CANVAS_HEIGHT / 2, 20, CANVAS_HEIGHT, { 
+            isStatic: true,
+            label: 'wall'
+          }),
           // Bottom wall
-          Matter.Bodies.rectangle(CANVAS_WIDTH / 2, CANVAS_HEIGHT + 10, CANVAS_WIDTH, 20, { isStatic: true })
+          Matter.Bodies.rectangle(CANVAS_WIDTH / 2, CANVAS_HEIGHT + 10, CANVAS_WIDTH, 20, { 
+            isStatic: true,
+            label: 'wall'
+          })
         ];
 
       // Create pegs in pyramid formation with organic positioning
@@ -115,9 +128,10 @@ export const PlinkoCanvas = forwardRef<PlinkoCanvasRef, PlinkoCanvasProps>(({
           
           const peg = Matter.Bodies.circle(x, y, PEG_RADIUS, {
               isStatic: true,
-              restitution: 0.9 + (Math.random() * 0.05), // Maior elasticidade para fluidez
-              friction: 0.0001, // Atrito ultra-baixo
-              frictionStatic: 0.0001 // Prevenir aderência
+              label: 'peg',
+              restitution: 0.3, // Reduced bounce for more natural feel
+              friction: 0.05, // Minimal friction
+              frictionStatic: 0.05
             });
           
           pegs.push(peg);
@@ -127,17 +141,20 @@ export const PlinkoCanvas = forwardRef<PlinkoCanvasRef, PlinkoCanvasProps>(({
       // Create multiplier zones using 100% horizontal space
       const zones: Matter.Body[] = [];
       const lastPegY = START_Y + (ROWS - 1) * ROW_SPACING;
-      const zoneY = lastPegY + 35; // Professional spacing below pyramid
+      const zoneY = lastPegY + 20; // Match visual zone positioning
       
-      // Distribuição de largura total para caixas de multiplicador
-      const zoneWidth = CANVAS_WIDTH / MULTIPLIERS.length; // 100% width divided equally
+      // Use consistent zone calculation with visual rendering
+      const totalGap = MULTIPLIERS.length - 1;
+      const gapSize = 2;
+      const availableWidth = CANVAS_WIDTH - (totalGap * gapSize);
+      const zoneWidth = availableWidth / MULTIPLIERS.length;
       
       for (let i = 0; i < MULTIPLIERS.length; i++) {
         const zone = Matter.Bodies.rectangle(
-          i * zoneWidth + zoneWidth / 2, // Full width distribution
-          zoneY + 25,
-          zoneWidth * 0.95, // Pequena lacuna entre zonas para clareza visual
-          50,
+          i * (zoneWidth + gapSize) + zoneWidth / 2, // Center each zone with gaps
+          zoneY + 24, // Center vertically in the visual zone
+          zoneWidth * 0.9, // Slightly smaller than visual for better detection
+          48, // Match visual zone height
           { 
             isStatic: true, 
             isSensor: true,
@@ -169,251 +186,133 @@ export const PlinkoCanvas = forwardRef<PlinkoCanvasRef, PlinkoCanvasProps>(({
 
   // Ball drop function
   const dropBall = () => {
-    console.log('🎯 dropBall called - conditions:');
-    console.log('  - engineRef.current:', !!engineRef.current);
-    console.log('  - animating:', animating);
     if (!engineRef.current) {
-      console.log('❌ Cannot drop ball - Matter.js engine not initialized');
       return;
     }
     
-    console.log('✅ All conditions met - Starting ball drop animation...');
     usePlinkoStore.setState({ animating: true });
     
     // Notify parent component that animation has started
-    setTimeout(() => {
-      onBallDrop?.();
-    }, 50); // Pequeno atraso para garantir que o estado local seja atualizado primeiro
+    onBallDrop?.();
 
-    // Criar corpo físico da bola com propriedades ultra-fluidas e orgânicas
+    // Create ball physics body with completely natural properties
     const ballWeightMultiplier = ballWeight || 1;
-    const ballFrictionValue = ballFriction || 0.05;
     
-    // Adicionar aleatoriedade sutil à posição de queda para sensação orgânica
-    const dropX = CANVAS_WIDTH / 2 + 15 + (Math.random() - 0.5) * 20;
+    // Natural drop position with minimal randomness
+    const dropX = CANVAS_WIDTH / 2 + 15 + (Math.random() - 0.5) * 5;
     
-    // Criar bola ultra-fluida e orgânica com mínima aderência
+    // Create ball with pure natural physics - no artificial effects
     const ballBody = Matter.Bodies.circle(
       dropX,
       30,
       BALL_RADIUS,
       {
-        restitution: 0.75 + (Math.random() * 0.15), // Elasticidade aumentada para fluidez
-        friction: 0.0005, // Atrito reduzido para movimento mais suave
-        frictionAir: 0.008 + (Math.random() * 0.004), // Menor resistência do ar
-        density: 0.0008 * ballWeightMultiplier, // Sensação mais leve
-        frictionStatic: 0.0001, // Minimizar aderência
-
-
+        restitution: 0.4, // Natural bounce
+        friction: 0.005, // Minimal friction
+        frictionAir: 0.0005, // Minimal air resistance
+        density: 0.001 * ballWeightMultiplier,
+        frictionStatic: 0.005
       }
     );
-    
-    // Adicionar efeito de vento sutil e rotação para movimento orgânico
-    const windForce = (Math.random() - 0.5) * 0.001;
-    const windDirection = Math.random() > 0.5 ? 1 : -1;
-    Matter.Body.applyForce(ballBody, ballBody.position, { x: windForce * windDirection, y: 0 });
-    
-    console.log('🏀 Corpo físico da bola criado:', ballBody.id);
 
-    // Create visual ball element with organic appearance
-        const ballSizePx = BALL_RADIUS * 2;
-        const ballElement = document.createElement('div');
-        ballElement.className = 'absolute rounded-full transition-all duration-75 ease-linear z-20';
-        ballElement.style.width = `${ballSizePx}px`;
-        ballElement.style.height = `${ballSizePx}px`;
-        ballElement.style.background = 'radial-gradient(circle at 30% 30%, #fff59d, #ffeb3b, #ff9800)';
-        ballElement.style.border = '1px solid rgba(255, 152, 0, 0.3)';
-        ballElement.style.boxShadow = 'inset -2px -2px 4px rgba(0,0,0,0.2), inset 2px 2px 4px rgba(255,255,255,0.5), 0 2px 8px rgba(0,0,0,0.3)';
+    // Create visual ball element with simple appearance
+    const ballSizePx = BALL_RADIUS * 2;
+    const ballElement = document.createElement('div');
+    ballElement.className = 'absolute rounded-full z-20';
+    ballElement.style.width = `${ballSizePx}px`;
+    ballElement.style.height = `${ballSizePx}px`;
+    ballElement.style.background = 'radial-gradient(circle at 30% 30%, #fff59d, #ffeb3b, #ff9800)';
+    ballElement.style.border = '1px solid rgba(255, 152, 0, 0.3)';
+    ballElement.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
     
     if (canvasRef.current) {
       canvasRef.current.appendChild(ballElement);
       ballRef.current = ballElement;
-      console.log('🎨 Elemento visual da bola adicionado ao DOM');
     } else {
-      console.log('❌ Não é possível adicionar a bola ao DOM - canvasRef não disponível');
       return;
     }
 
     // Add ball to physics world
     Matter.World.add(engineRef.current.world, [ballBody]);
-    console.log('🌍 Bola adicionada ao mundo Matter.js');
 
-    // Adicionar ouvintes de eventos para detecção de colisão com efeitos orgânicos
+    // Add collision detection for natural physics
     Matter.Events.on(engineRef.current, 'collisionStart', (event: any) => {
       const pairs = event.pairs;
       
       pairs.forEach((pair: any) => {
         const { bodyA, bodyB } = pair;
         
-        // Colisões orgânicas aprimoradas com física natural
-        if ((bodyA === ballBody && bodyB.label === 'peg') || 
-            (bodyB === ballBody && bodyA.label === 'peg')) {
-          
-          // Adicionar força aleatória sutil com variação orgânica
-          const randomForce = {
-            x: (Math.random() - 0.5) * 0.003,
-            y: (Math.random() - 0.5) * 0.001
-          };
-            Matter.Body.applyForce(ballBody, ballBody.position, randomForce);
-          
-          // Adicionar rotação/giro orgânica
-          const rotationForce = (Math.random() - 0.5) * 0.01;
-          Matter.Body.setAngularVelocity(ballBody, rotationForce);
-          
-          // Aplicar variação natural de amortecimento
-          const currentDamping = ballBody.frictionAir;
-          Matter.Body.set(ballBody, 'frictionAir', currentDamping * (0.95 + Math.random() * 0.1));
-        }
-        
-        // Adicionar resposta orgânica à colisão com parede
-        if ((bodyA === ballBody && bodyB.label === 'wall') || 
-            (bodyB === ballBody && bodyA.label === 'wall')) {
-          const wallForce = {
-            x: (Math.random() - 0.5) * 0.001,
-            y: Math.random() * 0.0005
-          };
-          Matter.Body.applyForce(ballBody, ballBody.position, wallForce);
-        }
-        
-        // Check if ball hit a zone
+        // Detect ball collision with zones
         if (bodyA === ballBody || bodyB === ballBody) {
           const otherBody = bodyA === ballBody ? bodyB : bodyA;
           
+          // Zone collision detection
           if (otherBody.label?.startsWith('zone-')) {
             const zoneIndex = parseInt(otherBody.label.split('-')[1]);
             const multiplier = MULTIPLIERS[zoneIndex];
             
-            // Calculate payout
-            const payout = betAmount * multiplier;
-            
-            // Add organic damping for natural deceleration
-           Matter.Body.setVelocity(ballBody, {
-              x: ballBody.velocity.x * 0.8,
-              y: ballBody.velocity.y * 0.8
-            });
-            
-            // Stop the animation
+            // Stop animation
             usePlinkoStore.setState({ animating: false });
             
-            // Clean up physics with natural delay
+            // Clean up
             setTimeout(() => {
               if (engineRef.current && ballBody) {
-                  Matter.World.remove(engineRef.current.world, ballBody);
+                Matter.World.remove(engineRef.current.world, ballBody);
                 if (ballRef.current) {
                   ballRef.current.remove();
                   ballRef.current = null;
                 }
               }
-            }, 300); // Slightly longer for natural feel
+            }, 100);
             
-            // Notify parent component
+            // Notify completion
             setTimeout(() => {
               onBallComplete?.(multiplier);
-            }, 400);
+            }, 150);
+            
+            return;
           }
         }
       });
     });
-    
-    // Add collision with pegs for more organic bounces
-    Matter.Events.on(engineRef.current, 'collisionActive', (event: any) => {
-      const pairs = event.pairs;
-      
-      pairs.forEach((pair: any) => {
-        const { bodyA, bodyB } = pair;
-        
-        if ((bodyA === ballBody || bodyB === ballBody) && 
-            (!bodyA.label?.startsWith('zone-') && !bodyB.label?.startsWith('zone-'))) {
-          
-          // Add subtle random force on peg collision for organic movement
-          const randomForce = (Math.random() - 0.5) * 0.002;
-          Matter.Body.applyForce(ballBody, ballBody.position, { 
-            x: randomForce, 
-            y: -randomForce * 0.5 
-          });
-        }
-      });
-    });
 
-    // Animation loop with organic movement
+    // Natural animation loop - no artificial effects
     const animate = () => {
       if (!ballBody || !ballElement) {
-        console.log('❌ Animação parada - corpo ou elemento da bola faltando');
         return;
       }
 
       const position = ballBody.position;
-      const baseX = position.x - BALL_RADIUS;
-      const baseY = position.y - BALL_RADIUS;
+      const x = position.x - BALL_RADIUS;
+      const y = position.y - BALL_RADIUS;
       
-      // Ultra-subtle micro-wobble for fluid movement
-      const wobbleX = Math.sin(Date.now() * 0.005) * 0.2;
-      const wobbleY = Math.cos(Date.now() * 0.004) * 0.1;
-      
-      const x = baseX + wobbleX;
-      const y = baseY + wobbleY;
-      
-      // Ultra-fluid positioning - simplified for performance
-        ballElement.style.left = `${x}px`;
-        ballElement.style.top = `${y}px`;
+      // Pure positioning - no wobble or artificial effects
+      ballElement.style.left = `${x}px`;
+      ballElement.style.top = `${y}px`;
 
-      // Check if ball reached bottom zones - 100% width calculation
-      if (position.y > CANVAS_HEIGHT - 80) {
-        console.log('🎯 Bola alcançou as zonas inferiores na posição:', position);
-        
-        // Calculate zone based on 100% width distribution
-        const zoneWidth = CANVAS_WIDTH / MULTIPLIERS.length;
-        const zoneIndex = Math.floor(position.x / zoneWidth);
-        const clampedZone = Math.max(0, Math.min(MULTIPLIERS.length - 1, zoneIndex));
-        const multiplier = MULTIPLIERS[clampedZone];
-        
-        console.log(`🎰 Bola aterrissou na zona ${clampedZone} com multiplicador ${multiplier}x`);
-
+      // Check if ball fell below the game area (safety cleanup)
+      if (position.y > CANVAS_HEIGHT + 50) {
         // Clean up
-        Matter.World.remove(engineRef.current!.world, ballBody);
+        if (engineRef.current) {
+          Matter.World.remove(engineRef.current.world, ballBody);
+        }
         ballElement.remove();
         ballRef.current = null;
         usePlinkoStore.setState({ animating: false });
         
-            console.log('🧹 Limpeza concluída - acionando callback de conclusão');
-
-        // Trigger completion callback
+        // Default to middle zone if no collision was detected
+        const defaultMultiplier = MULTIPLIERS[Math.floor(MULTIPLIERS.length / 2)];
+        
         setTimeout(() => {
-          console.log('📢 Calling onBallComplete with multiplier:', multiplier);
-          onBallComplete?.(multiplier);
-        }, 500);
+          onBallComplete?.(defaultMultiplier);
+        }, 100);
         
         return;
       }
-
-      // Ultra-light trail effect for fluid movement
-        if (Math.random() < 0.2) { // 20% chance for minimal trail
-          const trail = document.createElement('div');
-          trail.className = 'absolute rounded-full pointer-events-none';
-          trail.style.width = `${BALL_RADIUS * 0.8}px`;
-          trail.style.height = `${BALL_RADIUS * 0.8}px`;
-          trail.style.background = 'rgba(255,235,59,0.2)';
-          trail.style.left = `${position.x - BALL_RADIUS * 0.4}px`;
-          trail.style.top = `${position.y - BALL_RADIUS * 0.4}px`;
-          trail.style.opacity = '0.4';
-          trail.style.transition = 'opacity 0.3s ease-out';
-          trail.style.zIndex = '5';
-          
-          if (canvasRef.current) {
-            canvasRef.current.appendChild(trail);
-          }
-          
-          // Quick fade out
-          setTimeout(() => {
-            trail.style.opacity = '0';
-            setTimeout(() => trail.remove(), 300);
-          }, 50);
-        }
       
       requestAnimationFrame(animate);
     };
 
-    console.log('🎬 Iniciando loop de animação...');
     requestAnimationFrame(animate);
   };
 
@@ -474,34 +373,41 @@ export const PlinkoCanvas = forwardRef<PlinkoCanvasRef, PlinkoCanvasProps>(({
     const lastPegY = START_Y + (ROWS - 1) * ROW_SPACING;
     const zoneY = lastPegY + 20;
     
-    // Full width distribution for multiplier boxes
-    const zoneWidth = CANVAS_WIDTH / MULTIPLIERS.length+2;
+    // Perfect equal distribution with small gaps
+    const totalGap = MULTIPLIERS.length; // Total gap space
+    const gapSize = 0; // 2px gap between zones
+    const availableWidth = CANVAS_WIDTH - (totalGap * gapSize);
+    const zoneWidth = availableWidth / MULTIPLIERS.length + 2.2;
     
     return MULTIPLIERS.map((multiplier, index) => {
       // Material You accent colors based on multiplier value
       let colorClasses = "";
       let borderColor = "";
       
-      if (multiplier >= 24) {
-        // Highest values - #ff1744
-        colorClasses = "bg-gradient-to-t from-red-600 to-red-500 text-red-100";
-        borderColor = "border-red-400";
-      } else if (multiplier >= 8) {
-        // High values - #ff5722
-        colorClasses = "bg-gradient-to-t from-orange-600 to-orange-500 text-orange-100";
-        borderColor = "border-orange-400";
-      } else if (multiplier >= 3) {
-        // Medium-high - #ff9800
-        colorClasses = "bg-gradient-to-t from-amber-600 to-amber-500 text-amber-100";
-        borderColor = "border-amber-400";
-      } else if (multiplier > 1) {
-        // Medium - #ffc107, #ffeb3b
-        colorClasses = "bg-gradient-to-t from-yellow-600 to-yellow-500 text-yellow-100";
-        borderColor = "border-yellow-400";
+      if (multiplier >= 2.5) {
+        // Highest values (2.5x) - Red with smooth gradient
+        colorClasses = "bg-gradient-to-br from-red-500 via-red-600 to-red-700 text-white";
+        borderColor = "border-red-600";
+      } else if (multiplier >= 2.0) {
+        // High values (2.0x) - Orange with smooth gradient
+        colorClasses = "bg-gradient-to-br from-orange-500 via-orange-600 to-orange-700 text-white";
+        borderColor = "border-orange-300";
+      } else if (multiplier >= 1.7) {
+        // Medium-high values (1.7x) - Amber with smooth gradient
+        colorClasses = "bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700 text-white";
+        borderColor = "border-amber-300";
+      } else if (multiplier >= 1.2) {
+        // Medium values (1.2x) - Yellow with smooth gradient
+        colorClasses = "bg-gradient-to-br from-yellow-500 via-yellow-600 to-yellow-700 text-white";
+        borderColor = "border-yellow-300";
+      } else if (multiplier === 1.0) {
+        // Base value (1.0x) - Blue with smooth gradient
+        colorClasses = "bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 text-white";
+        borderColor = "border-blue-300";
       } else {
-        // Lowest - #4caf50
-        colorClasses = "bg-gradient-to-t from-green-600 to-green-500 text-green-100";
-        borderColor = "border-green-400";
+        // Lowest value (0.5x) - Green with smooth gradient (loss)
+        colorClasses = "bg-gradient-to-br from-green-500 via-green-600 to-green-700 text-white";
+        borderColor = "border-green-300";
       }
       
       return (
@@ -509,16 +415,16 @@ export const PlinkoCanvas = forwardRef<PlinkoCanvasRef, PlinkoCanvasProps>(({
           key={`zone-${index}`}
           className={cn(
             "absolute flex items-center justify-center text-xs font-bold rounded-t-lg transition-all duration-300",
+            "shadow-lg backdrop-blur-sm ",
             colorClasses,
-            borderColor,
-            "border-t border-opacity-40"
+            borderColor
           )}
           style={{
-            left: `${index * zoneWidth + (zoneWidth * 0.025)}px`, // 2.5% margin for clean spacing
+            left: `${index * (zoneWidth + gapSize)}px`, // Equal distribution with gaps
             top: `${zoneY}px`,
-            width: `${zoneWidth * 0.95}px`, // 95% of zone width for small gaps
+            width: `${zoneWidth}px`,
             height: '48px',
-            boxShadow: multiplier >= 8 ? '0 0 15px rgba(251, 191, 36, 0.5)' : '0 2px 8px rgba(0, 0, 0, 0.3)'
+            
           }}
         >
           {multiplier}x
