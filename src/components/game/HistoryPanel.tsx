@@ -30,7 +30,10 @@ export const HistoryPanel: React.FC = () => {
     });
   };
 
-  const formatCurrency = (amount: number) => {
+  const formatCurrency = (amount: number | null | undefined) => {
+    if (amount === null || amount === undefined || isNaN(amount)) {
+      return '0.000000';
+    }
     return amount.toFixed(6); // Match the balance format
   };
 
@@ -77,11 +80,11 @@ export const HistoryPanel: React.FC = () => {
             </div>
             <div>
               <p className="text-xs text-gray-400">Win Rate</p>
-              <p className="text-sm font-bold text-blue-400">{stats.winRate.toFixed(1)}%</p>
+              <p className="text-sm font-bold text-blue-400">{(stats.winRate ?? 0).toFixed(1)}%</p>
             </div>
             <div>
               <p className="text-xs text-gray-400">Max Multi</p>
-              <p className="text-sm font-bold text-yellow-500">{stats.maxMultiplier.toFixed(1)}x</p>
+              <p className="text-sm font-bold text-yellow-500">{(stats.maxMultiplier ?? 0).toFixed(1)}x</p>
             </div>
           </div>
         </div>
@@ -121,7 +124,7 @@ export const HistoryPanel: React.FC = () => {
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-bold text-white">
-                        {game.multiplier.toFixed(1)}x
+                        {(game.multiplier ?? 0).toFixed(1)}x
                       </span>
                       <span className="text-xs text-gray-400">
                         {formatTime(game.timestamp)}

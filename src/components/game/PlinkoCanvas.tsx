@@ -18,9 +18,6 @@ export interface PlinkoCanvasRef {
   dropBall: () => void;
 }
 
-interface Engine  {
-  
-}
 /**
  * Componente PlinkoCanvas
  * 
@@ -38,6 +35,7 @@ export const PlinkoCanvas = forwardRef<PlinkoCanvasRef, PlinkoCanvasProps>(({
   const canvasRef = useRef<HTMLDivElement>(null);
   const engineRef = useRef<Matter.Engine | null>(null);
   const ballRef = useRef<HTMLDivElement | null>(null);
+  const zoneElementsRef = useRef<HTMLDivElement[]>([]);
   const isSSRSafeMounted = useSSRSafe();
   const { animating } = usePlinkoStore();
 
@@ -138,23 +136,54 @@ export const PlinkoCanvas = forwardRef<PlinkoCanvasRef, PlinkoCanvasProps>(({
         }
       }
 
-      // Create multiplier zones using 100% horizontal space
+      // Create multiplier zones with physics bodies for ball containment
       const zones: Matter.Body[] = [];
       const lastPegY = START_Y + (ROWS - 1) * ROW_SPACING;
-      const zoneY = lastPegY + 20; // Match visual zone positioning
+      const zoneY = lastPegY + 20;
+      const zoneHeight = 48;
       
-      // Use consistent zone calculation with visual rendering
-      const totalGap = MULTIPLIERS.length - 1;
-      const gapSize = 2;
-      const availableWidth = CANVAS_WIDTH - (totalGap * gapSize);
+      // Use consistent zone calculation with visual rendering - no gaps
+      const availableWidth = CANVAS_WIDTH;
       const zoneWidth = availableWidth / MULTIPLIERS.length;
       
       for (let i = 0; i < MULTIPLIERS.length; i++) {
-        const zone = Matter.Bodies.rectangle(
-          i * (zoneWidth + gapSize) + zoneWidth / 2, // Center each zone with gaps
-          zoneY + 24, // Center vertically in the visual zone
-          zoneWidth * 0.9, // Slightly smaller than visual for better detection
-          48, // Match visual zone height
+        const zoneX = i * zoneWidth + zoneWidth / 2;
+        
+        // Create zone walls for ball containment - only between zones, not at edges
+        if (i > 0) {
+          const leftWall = Matter.Bodies.rectangle(
+            i * zoneWidth,
+            zoneY + zoneHeight / 2,
+            2, // Wall thickness
+            zoneHeight,
+            { 
+              isStatic: true,
+              label: 'zone-wall',
+              render: { visible: false }
+            }
+          );
+          zones.push(leftWall);
+        }
+        
+        // Create zone floor for ball to rest
+        const zoneFloor = Matter.Bodies.rectangle(
+          zoneX,
+          zoneY + zoneHeight - 2,
+          zoneWidth * 0.95,
+          4,
+          { 
+            isStatic: true,
+            label: 'zone-floor',
+            render: { visible: false }
+          }
+        );
+        
+        // Create trigger zone for detection
+        const triggerZone = Matter.Bodies.rectangle(
+          zoneX,
+          zoneY + zoneHeight / 2,
+          zoneWidth * 0.9,
+          zoneHeight * 0.8,
           { 
             isStatic: true, 
             isSensor: true,
@@ -162,7 +191,8 @@ export const PlinkoCanvas = forwardRef<PlinkoCanvasRef, PlinkoCanvasProps>(({
             render: { visible: false }
           }
         );
-        zones.push(zone);
+        
+        zones.push(zoneFloor, triggerZone);
       }
 
       // Adicionar todos os corpos ao mundo
@@ -235,7 +265,7 @@ export const PlinkoCanvas = forwardRef<PlinkoCanvasRef, PlinkoCanvasProps>(({
     // Add ball to physics world
     Matter.World.add(engineRef.current.world, [ballBody]);
 
-    // Add collision detection for natural physics
+    // Add collision detection for natural physics and zone effects
     Matter.Events.on(engineRef.current, 'collisionStart', (event: any) => {
       const pairs = event.pairs;
       
@@ -251,10 +281,24 @@ export const PlinkoCanvas = forwardRef<PlinkoCanvasRef, PlinkoCanvasProps>(({
             const zoneIndex = parseInt(otherBody.label.split('-')[1]);
             const multiplier = MULTIPLIERS[zoneIndex];
             
+            // Trigger zone flash effect
+            const zoneElement = zoneElementsRef.current[zoneIndex];
+            if (zoneElement) {
+              // Add flashing animation class
+              zoneElement.style.animation = 'flash 0.6s ease-in-out 3';
+              zoneElement.style.boxShadow = '0 0 20px rgba(255, 255, 255, 0.8), inset 0 0 20px rgba(255, 255, 255, 0.3)';
+              
+              // Reset animation after completion
+              setTimeout(() => {
+                zoneElement.style.animation = '';
+                zoneElement.style.boxShadow = '';
+              }, 1800);
+            }
+            
             // Stop animation
             usePlinkoStore.setState({ animating: false });
             
-            // Clean up
+            // Clean up with delay to show the ball settling
             setTimeout(() => {
               if (engineRef.current && ballBody) {
                 Matter.World.remove(engineRef.current.world, ballBody);
@@ -263,12 +307,12 @@ export const PlinkoCanvas = forwardRef<PlinkoCanvasRef, PlinkoCanvasProps>(({
                   ballRef.current = null;
                 }
               }
-            }, 100);
+            }, 800);
             
             // Notify completion
             setTimeout(() => {
               onBallComplete?.(multiplier);
-            }, 150);
+            }, 900);
             
             return;
           }
@@ -368,68 +412,74 @@ export const PlinkoCanvas = forwardRef<PlinkoCanvasRef, PlinkoCanvasProps>(({
     return pegs;
   };
 
-  // Render multiplier zones using 100% of horizontal space
+  // Render multiplier zones using 100% of horizontal space with physics containers
   const renderMultiplierZones = () => {
     const lastPegY = START_Y + (ROWS - 1) * ROW_SPACING;
     const zoneY = lastPegY + 20;
     
-    // Perfect equal distribution with small gaps
-    const totalGap = MULTIPLIERS.length; // Total gap space
-    const gapSize = 0; // 2px gap between zones
-    const availableWidth = CANVAS_WIDTH - (totalGap * gapSize);
-    const zoneWidth = availableWidth / MULTIPLIERS.length + 2.2;
+    // Perfect equal distribution without gaps
+    const availableWidth = CANVAS_WIDTH;
+    const zoneWidth = availableWidth / MULTIPLIERS.length;
+    
+    // Clear previous zone elements
+    zoneElementsRef.current = [];
     
     return MULTIPLIERS.map((multiplier, index) => {
       // Material You accent colors based on multiplier value
       let colorClasses = "";
-      let borderColor = "";
       
       if (multiplier >= 2.5) {
         // Highest values (2.5x) - Red with smooth gradient
         colorClasses = "bg-gradient-to-br from-red-500 via-red-600 to-red-700 text-white";
-        borderColor = "border-red-600";
       } else if (multiplier >= 2.0) {
         // High values (2.0x) - Orange with smooth gradient
         colorClasses = "bg-gradient-to-br from-orange-500 via-orange-600 to-orange-700 text-white";
-        borderColor = "border-orange-300";
       } else if (multiplier >= 1.7) {
         // Medium-high values (1.7x) - Amber with smooth gradient
         colorClasses = "bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700 text-white";
-        borderColor = "border-amber-300";
       } else if (multiplier >= 1.2) {
         // Medium values (1.2x) - Yellow with smooth gradient
         colorClasses = "bg-gradient-to-br from-yellow-500 via-yellow-600 to-yellow-700 text-white";
-        borderColor = "border-yellow-300";
       } else if (multiplier === 1.0) {
         // Base value (1.0x) - Blue with smooth gradient
         colorClasses = "bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 text-white";
-        borderColor = "border-blue-300";
       } else {
         // Lowest value (0.5x) - Green with smooth gradient (loss)
         colorClasses = "bg-gradient-to-br from-green-500 via-green-600 to-green-700 text-white";
-        borderColor = "border-green-300";
       }
       
-      return (
+      // Determine rounded corners - only first and last zones get top corners
+      let roundedClass = "";
+      if (index === 0) {
+        roundedClass = "rounded-tl-lg"; // Top-left corner only
+      } else if (index === MULTIPLIERS.length - 1) {
+        roundedClass = "rounded-tr-lg"; // Top-right corner only
+      }
+      
+      const zoneElement = (
         <div
           key={`zone-${index}`}
+          ref={(el) => {
+            if (el) zoneElementsRef.current[index] = el;
+          }}
           className={cn(
-            "absolute flex items-center justify-center text-xs font-bold rounded-t-lg transition-all duration-300",
-            "shadow-lg backdrop-blur-sm ",
+            "absolute flex items-center justify-center text-xs font-bold transition-all duration-300",
+            "shadow-lg backdrop-blur-sm",
             colorClasses,
-            borderColor
+            roundedClass
           )}
           style={{
-            left: `${index * (zoneWidth + gapSize)}px`, // Equal distribution with gaps
+            left: `${index * zoneWidth}px`, // No gaps between zones
             top: `${zoneY}px`,
             width: `${zoneWidth}px`,
             height: '48px',
-            
           }}
         >
           {multiplier}x
         </div>
       );
+      
+      return zoneElement;
     });
   };
 
@@ -462,6 +512,19 @@ export const PlinkoCanvas = forwardRef<PlinkoCanvasRef, PlinkoCanvasProps>(({
           boxShadow: '0 0 30px rgba(168, 85, 247, 0.3), inset 0 0 20px rgba(168, 85, 247, 0.1)'
         }}
       >
+        {/* CSS Animation for zone flashing */}
+        <style jsx>{`
+          @keyframes flash {
+            0%, 100% {
+              filter: brightness(1);
+              transform: scale(1);
+            }
+            50% {
+              filter: brightness(1.5);
+              transform: scale(1.05);
+            }
+          }
+        `}</style>
         {/* Pegs */}
         {renderPegs()}
         

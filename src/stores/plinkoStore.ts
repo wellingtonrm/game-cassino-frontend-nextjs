@@ -415,7 +415,10 @@ export const usePlinkoStore = create<PlinkoState>()(persist(
       return state.balance;
     },
     
-    formatBalance: (amount: number) => {
+    formatBalance: (amount: number | null | undefined) => {
+      if (amount === null || amount === undefined || isNaN(amount)) {
+        return '0.000000';
+      }
       return amount.toFixed(6);
     }
   }),
