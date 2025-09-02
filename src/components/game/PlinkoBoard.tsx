@@ -20,16 +20,21 @@ export const PlinkoBoard: React.FC = () => {
   } = usePlinkoStore();
 
   const handleBallComplete = useCallback((multiplier: number) => {
-    const payout = settings.betAmount * multiplier;
+    // Defensive programming - ensure valid multiplier
+    const safeMultiplier = (multiplier !== null && multiplier !== undefined && !isNaN(multiplier) && multiplier > 0) 
+      ? multiplier 
+      : 1.0;
+    
+    const payout = settings.betAmount * safeMultiplier;
     const result: PlinkoResult = {
-      multiplier,
+      multiplier: safeMultiplier,
       payout,
       betAmount: settings.betAmount,
       timestamp: new Date()
     };
     
+    console.log(`🎯 Ball completed with ${safeMultiplier}x multiplier! Payout: ${payout}`);
     finishGame(result);
-    console.log(`Ball landed with ${multiplier}x multiplier! Payout: ${payout}`);
   }, [settings.betAmount, finishGame]);
 
   const handleBallDrop = useCallback(() => {

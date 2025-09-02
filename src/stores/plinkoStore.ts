@@ -115,7 +115,7 @@ export const RISK_MULTIPLIERS = {
 };
 
 export const MAX_HISTORY = 100;
-export const INITIAL_BALANCE = 1000;
+export const INITIAL_BALANCE = 200;
 
 // ============================================================================
 // STORE ZUSTAND - GERENCIAMENTO DE ESTADO
@@ -270,29 +270,48 @@ export const usePlinkoStore = create<PlinkoState>()(persist(
     finishGame: (result: PlinkoResult) => {
       const state = get();
       
+      // Validate result data to prevent undefined/NaN issues
+      const safeResult: PlinkoResult = {
+        multiplier: result.multiplier ?? 1.0,
+        payout: result.payout ?? 0,
+        betAmount: result.betAmount ?? state.settings.betAmount,
+        timestamp: result.timestamp ?? new Date(),
+        ballPath: result.ballPath
+      };
+      
+      // Additional safety checks
+      if (isNaN(safeResult.multiplier) || safeResult.multiplier < 0) {
+        safeResult.multiplier = 1.0;
+      }
+      if (isNaN(safeResult.payout) || safeResult.payout < 0) {
+        safeResult.payout = safeResult.betAmount * safeResult.multiplier;
+      }
+      
+      console.log('🎯 finishGame called with result:', safeResult);
+      
       // Adiciona o resultado ao histórico
-      const newHistory = [result, ...state.history].slice(0, MAX_HISTORY);
+      const newHistory = [safeResult, ...state.history].slice(0, MAX_HISTORY);
       
       // Adiciona os ganhos ao saldo
-      const newBalance = state.balance + result.payout;
+      const newBalance = state.balance + safeResult.payout;
       
       set({
         isPlaying: false,
         animating: false,
-        currentResult: result,
+        currentResult: safeResult,
         history: newHistory,
         balance: newBalance
       });
       
       // Mostra toast de resultado
-      if (result.payout > 0) {
-        const winType = result.multiplier >= 50 ? 'mega' : 
-                      result.multiplier >= 10 ? 'big' : 'regular';
+      if (safeResult.payout > 0) {
+        const winType = safeResult.multiplier >= 50 ? 'mega' : 
+                      safeResult.multiplier >= 10 ? 'big' : 'regular';
         
         const messages = {
-          regular: `Vitória! ${result.multiplier}x - +${result.payout.toFixed(2)} créditos! 🎉`,
-          big: `BIG WIN! ${result.multiplier}x - +${result.payout.toFixed(2)} créditos! 🔥`,
-          mega: `MEGA WIN! ${result.multiplier}x - +${result.payout.toFixed(2)} créditos! 💎`
+          regular: `Vitória! ${safeResult.multiplier}x - +${safeResult.payout.toFixed(2)} créditos! 🎉`,
+          big: `BIG WIN! ${safeResult.multiplier}x - +${safeResult.payout.toFixed(2)} créditos! 🔥`,
+          mega: `MEGA WIN! ${safeResult.multiplier}x - +${safeResult.payout.toFixed(2)} créditos! 💎`
         };
         
         toast.success(messages[winType], {
@@ -412,7 +431,11 @@ export const usePlinkoStore = create<PlinkoState>()(persist(
     
     getMaxBet: () => {
       const state = get();
-      return state.balance;
+      const balance = state.balance;
+      if (balance === null || balance === undefined || isNaN(balance) || balance < 0) {
+        return 0;
+      }
+      return balance;
     },
     
     formatBalance: (amount: number | null | undefined) => {
@@ -429,7 +452,17 @@ export const usePlinkoStore = create<PlinkoState>()(persist(
       history: state.history,
       soundEnabled: state.soundEnabled,
       settings: state.settings
-    })
+    }),
+    onRehydrateStorage: () => (state) => {
+      // Ensure balance is never null/undefined and has a minimum value
+      if (state && (state.balance === null || state.balance === undefined || state.balance < 0)) {
+        state.balance = INITIAL_BALANCE;
+      }
+      // If balance is 0 and there's no game history, reset to initial balance
+      if (state && state.balance === 0 && (!state.history || state.history.length === 0)) {
+        state.balance = INITIAL_BALANCE;
+      }
+    }
   }
 ));
 

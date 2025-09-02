@@ -419,7 +419,7 @@ export const PlinkoCanvas = forwardRef<PlinkoCanvasRef, PlinkoCanvasProps>(({
     
     // Perfect equal distribution without gaps
     const availableWidth = CANVAS_WIDTH;
-    const zoneWidth = availableWidth / MULTIPLIERS.length;
+    const zoneWidth = availableWidth / MULTIPLIERS.length+2.1;
     
     // Clear previous zone elements
     zoneElementsRef.current = [];

@@ -9,7 +9,7 @@ interface WalletState {
 }
 
 export const useWalletStore = create<WalletState>((set) => ({
-  balance: 0,
+  balance:0,
   isLoading: false,
   setBalance: (balance) => set({ balance }),
   setLoading: (isLoading) => set({ isLoading }),
