@@ -390,16 +390,7 @@ export default function WalletPage() {
   return (
     <TooltipProvider>
       <div className="min-h-screen bg-gray-950">
-        {/* Status Bar - Android Style */}
-        <div className="bg-gray-900 h-6 w-full fixed top-0 left-0 right-0 z-50 flex items-center justify-end px-2">
-          <div className="flex items-center space-x-2">
-            <div className="text-white text-xs">4G</div>
-            <div className="text-white text-xs">100%</div>
-            <div className="w-4 h-3 border border-white rounded-sm flex items-center justify-center">
-              <div className="w-2 h-2 bg-white"></div>
-            </div>
-          </div>
-        </div>
+       
         
        
 
