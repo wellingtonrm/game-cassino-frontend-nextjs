@@ -401,41 +401,7 @@ export default function WalletPage() {
           </div>
         </div>
         
-        {/* App Bar - Material Design */}
-        <div className="bg-gray-900 shadow-md pt-6 pb-2 px-4 sticky top-0 z-40">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center overflow-hidden">
-                <span className="text-lg">👤</span>
-              </div>
-              <div>
-                <p className="text-white text-sm font-medium">
-                  {ensName || formatAddress(walletAddress || '', 6)}
-                </p>
-                {!isCorrectNetwork && (
-                  <p className="text-amber-400 text-xs font-medium">Rede Incorreta</p>
-                )}
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-gray-300 hover:text-white p-2 rounded-full hover:bg-gray-800 transition-colors"
-              >
-                <Scan className="h-5 w-5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-gray-300 hover:text-white p-2 rounded-full hover:bg-gray-800 transition-colors"
-              >
-                <Bell className="h-5 w-5" />
-              </Button>
-            </div>
-          </div>
-        </div>
+       
 
         {/* Alerta de rede incorreta - Material Design */}
         {!isCorrectNetwork && (
@@ -656,66 +622,9 @@ export default function WalletPage() {
           ))}
         </div>
 
-        {/* Bottom Navigation - Material Design */}
-        <div className="fixed bottom-0 left-0 right-0 bg-gray-900 shadow-lg z-50">
-          <div className="flex justify-around items-center py-2 px-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="flex flex-col items-center space-y-1 text-gray-400 hover:text-white rounded-full p-1 transition-colors"
-            >
-              <Send className="h-5 w-5" />
-              <span className="text-[10px]">Enviar</span>
-            </Button>
-            
-            <Button
-              variant="ghost"
-              size="sm"
-              className="flex flex-col items-center space-y-1 text-purple-500 relative"
-            >
-              <div className="absolute -top-1 w-full flex justify-center">
-                <div className="w-8 h-1 bg-purple-500 rounded-full"></div>
-              </div>
-              <Wallet className="h-5 w-5" />
-              <span className="text-[10px]">Carteira</span>
-            </Button>
-            
-            <Button
-              variant="ghost"
-              size="sm"
-              className="flex flex-col items-center space-y-1 text-gray-400 hover:text-white rounded-full p-1 transition-colors"
-            >
-              <Scan className="h-5 w-5" />
-              <span className="text-[10px]">Receber</span>
-            </Button>
-            
-            <Button
-              variant="ghost"
-              size="sm"
-              className="flex flex-col items-center space-y-1 text-gray-400 hover:text-white rounded-full p-1 transition-colors"
-            >
-              <ArrowUpDown className="h-5 w-5" />
-              <span className="text-[10px]">Trocar</span>
-            </Button>
-            
-            <Button
-              variant="ghost"
-              size="sm"
-              className="flex flex-col items-center space-y-1 text-gray-400 hover:text-white rounded-full p-1 transition-colors"
-            >
-              <Settings className="h-5 w-5" />
-              <span className="text-[10px]">Config</span>
-            </Button>
-          </div>
-          
-          {/* Home Indicator for Android */}
-          <div className="flex justify-center py-1 bg-black">
-            <div className="w-24 h-1 bg-gray-700 rounded-full"></div>
-          </div>
-        </div>
+     
         
-        {/* Padding bottom for fixed navigation */}
-        <div className="h-20" />
+      
       </div>
     </TooltipProvider>
   )
