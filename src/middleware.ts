@@ -12,15 +12,7 @@ const PUBLIC_ROUTES = [
 ] as const;
 
 const PROTECTED_ROUTES = [
-  '/wallet',
-  '/wallet/*',
-  '/checkout',
-  '/m/wallet',
-  '/m/wallet/*',
-  '/m/checkout',
-  '/d/wallet',
-  '/d/wallet/*',
-  '/d/checkout',
+
 ] as const;
 
 // Rotas específicas para mobile e desktop

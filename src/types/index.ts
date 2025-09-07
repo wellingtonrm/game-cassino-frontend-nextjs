@@ -70,3 +70,95 @@ export interface UnauthorizedResponse {
   success: boolean
   message?: string
 }
+
+// Web3 Wallet Types
+export interface Web3WalletState {
+  address: string | null
+  isConnected: boolean
+  chainId: number | null
+  isLoading: boolean
+  error: string | null
+  maticBalance: string
+  usdtBalance: string
+  ensName: string | null
+  connector: string | null
+}
+
+export interface TokenBalance {
+  balance: string
+  formatted: string
+  decimals: number
+  symbol: string
+  usdValue?: number
+}
+
+export interface Web3Session {
+  address: string
+  chainId: number
+  maticBalance: string
+  usdtBalance: string
+  connectedAt: number
+  lastUpdated: number
+  connector: string
+}
+
+export interface NetworkConfig {
+  id: number
+  name: string
+  network: string
+  nativeCurrency: {
+    name: string
+    symbol: string
+    decimals: number
+  }
+  rpcUrls: {
+    default: {
+      http: string[]
+    }
+    public: {
+      http: string[]
+    }
+  }
+  blockExplorers: {
+    default: {
+      name: string
+      url: string
+    }
+  }
+  contracts?: {
+    usdt?: {
+      address: string
+      decimals: number
+    }
+  }
+}
+
+export interface CurrencyConversion {
+  matic: {
+    usd: number
+  }
+  usdt: {
+    usd: number
+  }
+}
+
+export interface PendingTransaction {
+  hash: string
+  type: 'approve' | 'transfer' | 'deposit' | 'withdrawal'
+  amount?: string
+  timestamp: number
+  status: 'pending' | 'confirmed' | 'failed'
+}
+
+export interface Web3WalletActions {
+  setConnected: (address: string, chainId: number, connector: string) => void
+  setDisconnected: () => void
+  setLoading: (loading: boolean) => void
+  setError: (error: string | null) => void
+  setMaticBalance: (balance: string) => void
+  setUSDTBalance: (balance: string) => void
+  setEnsName: (ensName: string | null) => void
+  updateSession: () => void
+  addPendingTransaction: (tx: PendingTransaction) => void
+  removePendingTransaction: (hash: string) => void
+}

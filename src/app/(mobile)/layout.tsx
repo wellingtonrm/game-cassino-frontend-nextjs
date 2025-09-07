@@ -1,3 +1,5 @@
+import AppBar from "@/components/mobile/appBar";
+import BottomNavigationBar from "@/components/mobile/bottomNavigationBar";
 import type { Metadata, Viewport } from "next";
 
 export const metadata: Metadata = {
@@ -72,6 +74,11 @@ export default function MobileRootLayout({
   children: React.ReactNode;
 }>) {
   return (
-      children
+    <>
+      <AppBar />
+      {children}
+      <BottomNavigationBar />
+    </>
+     
   );
 }

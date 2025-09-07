@@ -10,7 +10,7 @@ interface NavigationState {
 }
 
 export const useNavigationStore = create<NavigationState>()((set) => ({
-  activeTab: 'casino', // Default to casino since we're on the Plinko page
+  activeTab: 'home', // Default to casino since we're on the Plinko page
   setActiveTab: (tab: NavigationTab) => set({ activeTab: tab }),
   isDrawerOpen: false,
   setDrawerOpen: (open: boolean) => set({ isDrawerOpen: open }),
