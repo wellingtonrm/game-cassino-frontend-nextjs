@@ -76,6 +76,18 @@ body {
   background: #4b5563;
 }
 
+/* Hide scrollbar utility class */
+.scrollbar-hide {
+  /* Firefox */
+  scrollbar-width: none;
+  /* Safari and Chrome */
+  -ms-overflow-style: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* Custom animations */
 @keyframes fadeIn {
   from {

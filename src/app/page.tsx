@@ -11,7 +11,7 @@ import {
   VolumeX
 } from 'lucide-react';
 
-export default function PlinkoGame() {
+export default function PlinkoGamePage() {
   const { isAuthenticated } = useAuth();
   const router = useRouter();
   const [balance, setBalance] = useState(21.38);
@@ -141,6 +141,7 @@ export default function PlinkoGame() {
     }
     
     return pins;
+    // Alternativa: usar o componente PlinkoBoard do diretório plinko
   };
 
   return (

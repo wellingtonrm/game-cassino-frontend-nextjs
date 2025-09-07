@@ -45,17 +45,7 @@ export const metadata: Metadata = {
     description: "Aplicativo de cassino premium com jogos de Plinko, Slots, Roleta e Raspadinha.",
     images: ["/icons/icon-512x512.svg"],
   },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-    viewportFit: "cover",
-  },
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#1a1a2e" },
-    { media: "(prefers-color-scheme: dark)", color: "#1a1a2e" },
-  ],
+
   other: {
     "mobile-web-app-capable": "yes",
     "apple-mobile-web-app-capable": "yes",
@@ -63,6 +53,17 @@ export const metadata: Metadata = {
     "msapplication-TileColor": "#1a1a2e",
     "msapplication-config": "/browserconfig.xml",
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#1a1a2e" },
+    { media: "(prefers-color-scheme: dark)", color: "#1a1a2e" },
+  ],
 };
 
 export default function MobileRootLayout({

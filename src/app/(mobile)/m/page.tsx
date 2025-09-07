@@ -1,38 +1,41 @@
 'use client'
 
-import React, { useState, useEffect, useCallback, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ChevronDown, Menu, Bell, Home, Gamepad2, Activity, User, Wallet, 
          TrendingUp, Trophy, Target, 
-         Zap, Crown, Settings, 
-         Play} from 'lucide-react'
+         Zap, Crown, Settings } from 'lucide-react'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
 import Logo from '@/components/Logo'
 import { useNavigationStore, type NavigationTab } from '@/stores/navigationStore'
-import { usePlinkoStore, type PlinkoResult } from '@/stores/plinkoStore'
-import { PlinkoBoard, GameControls, GameStats, HistoryPanel } from '@/components/game'
+import { usePlinkoStore } from '@/stores/plinkoStore'
 import { RippleButton } from '@/components/ui/RippleButton'
-import { useSSRSafe } from '@/hooks/useSSRSafe'
 
 
 
 const navigationItems = [
-  { icon: Gamepad2, label: 'Casino', active: true },
-  { icon: Activity, label: 'Sports', active: false },
+  { icon: Gamepad2, label: 'Cassino', active: true },
+  { icon: Activity, label: 'Esportes', active: false },
   { icon: TrendingUp, label: 'Trading', active: false },
-  { icon: Zap, label: 'Racing', active: false },
-  { icon: Target, label: 'Lottery', active: false },
-  { icon: Crown, label: 'VIP Club', active: false },
-  { icon: Trophy, label: 'Leaderboard', active: false },
+  { icon: Zap, label: 'Corridas', active: false },
+  { icon: Target, label: 'Loteria', active: false },
+  { icon: Crown, label: 'Clube VIP', active: false },
+  { icon: Trophy, label: 'Ranking', active: false },
 ]
 
 const bottomNavItems = [
-  { icon: Home, label: 'Home', tab: 'home' as NavigationTab, route: '/' },
-  { icon: Gamepad2, label: 'Casino', tab: 'casino' as NavigationTab, route: '/m' },
-  { icon: Activity, label: 'Sports', tab: 'sports' as NavigationTab, route: '/sports' },
-  { icon: User, label: 'Profile', tab: 'profile' as NavigationTab, route: '/profile' },
-  { icon: Wallet, label: 'Wallet', tab: 'wallet' as NavigationTab, route: '/wallet' },
+  { icon: Home, label: 'Início', tab: 'home' as NavigationTab, route: '/' },
+  { icon: Gamepad2, label: 'Cassino', tab: 'casino' as NavigationTab, route: '/m' },
+  { icon: Activity, label: 'Esportes', tab: 'sports' as NavigationTab, route: '/sports' },
+  { icon: User, label: 'Perfil', tab: 'profile' as NavigationTab, route: '/profile' },
+  { icon: Wallet, label: 'Carteira', tab: 'wallet' as NavigationTab, route: '/wallet' },
+]
+
+// Lista de jogos disponíveis no cassino
+const casinoGames = [
+  { name: 'Plinko', route: '/m/plinko', icon: 'plinko-icon.svg' },
+  // Adicione outros jogos aqui conforme necessário
 ]
 
 // Plinko Game Component using Professional Phaser.js Scene with Zustand Store
@@ -42,7 +45,7 @@ const bottomNavItems = [
 
 
 
-export default function MobilePlinkoPage() {
+export default function MobileCasinoPage() {
   const router = useRouter()
   const { activeTab, setActiveTab, isDrawerOpen, setDrawerOpen } = useNavigationStore()
   
@@ -54,112 +57,14 @@ export default function MobilePlinkoPage() {
     setIsMounted(true)
   }, [])
   
-  // ============================================================================
-  // DEMONSTRATION: Using Zustand for State Sharing
-  // ============================================================================
-  // The usePlinkoStore hook provides access to centralized Plinko game state
-  // that can be shared across multiple components without prop drilling.
-  // 
-  // Key benefits:
-  // 1. Centralized state management - All game data in one place
-  // 2. Component independence - Components can access state directly
-  // 3. Automatic persistence - Game state is automatically saved/loaded
-  // 4. Type safety - Full TypeScript support with proper typing
-  // 5. Performance - Only components using specific state pieces re-render
-  //
-  // Usage examples:
-  // - PlinkoBoard component uses: settings, isPlaying, animating, etc.
-  // - PlinkoControlPanel component uses: balance, settings, actions, etc.
-  // - PlinkoHistory component uses: history, clearHistory, etc.
-  // - This main component uses: balance, settings, game actions, etc.
-  //
-  // All components stay in sync automatically through Zustand!
-  // ============================================================================
+  // Acesso ao saldo do usuário para exibição no cabeçalho
+  const { balance, formatBalance } = usePlinkoStore()
   
-  const { 
-    balance,           // Current player balance
-    settings,          // Game settings (bet amount, risk level, etc.)
-    isPlaying,         // Is game currently playing
-    animating,         // Is ball currently animating
-    isAutoPlay,        // Is auto-play mode enabled
-    autoPlayRunning,   // Is auto-play currently running
-    setBetAmount,      // Action to set bet amount
-    setRiskLevel,      // Action to set risk level
-    setGameMode,       // Action to set game mode (manual/auto)
-    setBallWeight,     // Action to set ball weight
-    setBallFriction,   // Action to set ball friction
-    setBallSize,       // Action to set ball size
-    startGame,         // Action to start a single game
-    startAutoPlay,     // Action to start auto-play
-    stopAutoPlay,      // Action to stop auto-play
-    canAffordBet,      // Utility to check if player can afford current bet
-    getMaxBet,         // Utility to get maximum possible bet
-    formatBalance      // Utility to format balance display
-  } = usePlinkoStore()
-  
-
-
   // Handle navigation
   const handleNavigation = (tab: NavigationTab, route: string) => {
     setActiveTab(tab)
     if (route !== '/m') { // Don't navigate away from current page if it's casino
       router.push(route)
-    }
-  }
-
-
-
-  const handleBetChange = (amount: number) => {
-    const validAmount = Math.max(1, Math.min(getMaxBet(), amount))
-    setBetAmount(validAmount)
-  }
-
-  const handleQuickBet = (multiplier: number) => {
-    const newAmount = settings.betAmount * multiplier
-    const validAmount = Math.min(getMaxBet(), newAmount)
-    setBetAmount(validAmount)
-  }
-
-  const handleMaxBet = () => {
-    setBetAmount(getMaxBet())
-  }
-
-  const handlePlayClick = () => {
-    console.log('=== PLAY BUTTON CLICKED ===');
-    console.log('Current balance:', balance);
-    console.log('Bet amount:', settings.betAmount);
-    console.log('Can afford bet:', canAffordBet());
-    console.log('Is playing:', isPlaying);
-    console.log('Is animating:', animating);
-    console.log('Settings:', settings);
-    
-    // Check conditions before starting
-    if (canAffordBet() && !isPlaying && !animating) {
-      console.log('✅ All conditions met - Starting game...');
-      const result = startGame();
-      console.log('Game start result:', result);
-      
-      if (result) {
-        console.log('🎯 Game started successfully - ball should drop now!');
-      } else {
-        console.log('❌ Game failed to start despite conditions being met');
-      }
-    } else {
-      console.log('❌ Cannot start game:');
-      console.log('  - Can afford bet:', canAffordBet());
-      console.log('  - Not playing:', !isPlaying);
-      console.log('  - Not animating:', !animating);
-      
-      // Provide user feedback
-      if (!canAffordBet()) {
-        console.log('💰 Insufficient balance for bet');
-      }
-      if (isPlaying) {
-        console.log('🎮 Game already in progress');
-      }
-      if (animating) {
-        console.log('🏀 Ball animation in progress');
-      }
     }
   }
 
@@ -185,7 +90,7 @@ export default function MobilePlinkoPage() {
                   </div>
                   <div>
                     <h2 className="text-xl font-bold text-white">Boominas</h2>
-                    <p className="text-sm text-gray-400">Premium Gaming</p>
+                    <p className="text-sm text-gray-400">Jogos Premium</p>
                   </div>
                 </div>
               </div>
@@ -208,11 +113,11 @@ export default function MobilePlinkoPage() {
                 ))}
               </nav>
               
-              {/* Drawer Footer */}
+              {/* Rodapé do Drawer */}
               <div className="p-6 border-t border-gray-800">
                 <div className="flex items-center space-x-3">
                   <Settings className="w-5 h-5 text-gray-400" />
-                  <span className="text-gray-300">Settings</span>
+                  <span className="text-gray-300">Configurações</span>
                 </div>
               </div>
             </div>
@@ -236,35 +141,45 @@ export default function MobilePlinkoPage() {
         </div>
       </header>
 
-      {/* Main Content - Optimized for mobile Android app feel with increased game area */}
+      {/* Conteúdo Principal - Otimizado para mobile com visual de aplicativo Android */}
       <main className="flex-1 overflow-auto pb-16">
-        <div className="space-y-1">
-          {/* Plinko Game Board - Full screen Android app style with 9 rows */}
-          <div className="px-1">
-            <PlinkoBoard />
+        <div className="p-4">
+          <h1 className="text-2xl font-bold mb-4">Cassino</h1>
+          
+          {/* Lista de Jogos Disponíveis */}
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            {casinoGames.map((game, index) => (
+              <RippleButton
+                key={index}
+                onClick={() => router.push(game.route)}
+                className="bg-[#1a1a2e] rounded-lg p-4 flex flex-col items-center justify-center h-32 border border-gray-800 hover:border-purple-500 transition-colors"
+              >
+                <div className="w-12 h-12 bg-purple-600/20 rounded-full flex items-center justify-center mb-2">
+                  <Gamepad2 className="w-6 h-6 text-purple-400" />
+                </div>
+                <span className="font-medium">{game.name}</span>
+              </RippleButton>
+            ))}
           </div>
           
-          {/* Compact Game Controls - Android bottom sheet style with reduced spacing */}
-          <GameControls 
-            onPlayClick={handlePlayClick}
-            onBetChange={handleBetChange}
-            onQuickBet={handleQuickBet}
-            onMaxBet={handleMaxBet}
-            onRiskChange={setRiskLevel}
-            onBallWeightChange={setBallWeight}
-            onBallFrictionChange={setBallFriction}
-            onBallSizeChange={setBallSize}
-          />
-
-          {/* Unified Game Statistics Component */}
-          <GameStats />
-          
-          {/* History Panel */}
-          <HistoryPanel />
+          {/* Seção de Jogos Populares */}
+          <div className="mb-6">
+            <h2 className="text-xl font-bold mb-3">Jogos Populares</h2>
+            <div className="bg-[#1a1a2e] rounded-lg p-4 border border-gray-800">
+              <p className="text-gray-400">Experimente nosso jogo mais popular:</p>
+              <RippleButton
+                onClick={() => router.push('/m/plinko')}
+                className="w-full mt-3 bg-purple-600 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-2"
+              >
+                <Gamepad2 className="w-5 h-5" />
+                Jogar Plinko
+              </RippleButton>
+            </div>
+          </div>
         </div>
       </main>
 
-      {/* Bottom Navigation - Android Style with Zustand */}
+      {/* Navegação Inferior - Estilo Android com Zustand */}
       <nav className="fixed bottom-0 left-0 right-0 bg-[#1a1a2e] border-t border-gray-800 px-4 py-2 z-40">
         <div className="flex items-center justify-around">
           {bottomNavItems.map((item, index) => {
