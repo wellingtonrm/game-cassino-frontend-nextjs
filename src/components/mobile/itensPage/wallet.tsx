@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { useAccount, useChainId, useSwitchChain } from 'wagmi'
 import { polygon } from 'wagmi/chains'
+import { useNavigationStore } from '@/stores/navigationStore'
 import { 
   AlertTriangle, 
   Wallet, 
@@ -38,6 +39,8 @@ import {
   getMockPrices 
 } from '@/lib/web3Utils'
 
+// Adicione estilos globais para tipografia Material Design
+
 export default function WalletPage() {
   const [copied, setCopied] = useState(false)
   const [isRefreshing, setIsRefreshing] = useState(false)
@@ -49,8 +52,20 @@ export default function WalletPage() {
     sol: false,
     trx: false,
     thorchain: false,
-    dash: false,
+    dash: false
   })
+  
+  const { setPageLoading } = useNavigationStore()
+  
+  // Quando o componente é montado, definimos o loading como false
+  useEffect(() => {
+    // Simula um tempo de carregamento para os componentes
+    const timer = setTimeout(() => {
+      setPageLoading(false)
+    }, 700) // 700ms de delay para simular carregamento
+    
+    return () => clearTimeout(timer)
+  }, [setPageLoading])
   
   // Hooks Web3
   const { address } = useAccount()
@@ -148,7 +163,7 @@ export default function WalletPage() {
     }))
   }
   
-  // Lista de tokens para exibir
+  // Lista de tokens para exibir - Material Design Colors
   const tokenList = [
     {
       id: 'usdt',
@@ -156,10 +171,10 @@ export default function WalletPage() {
       symbol: 'USDT',
       balance: usdtBalance.balance,
       usdValue: usdtBalance.balanceAsNumber,
-      icon: '💚',
-      color: 'bg-green-500',
-      isExpandable: true,
-      isLoading: usdtBalance.isLoading,
+        icon: '💚',
+        color: 'bg-teal-600',
+        isExpandable: true,
+        isLoading: usdtBalance.isLoading,
     },
     {
       id: 'matic',
@@ -167,10 +182,10 @@ export default function WalletPage() {
       symbol: 'MATIC',
       balance: balances.matic.balance,
       usdValue: balances.matic.usdValue || 0,
-      icon: '🟣',
-      color: 'bg-purple-500',
-      isExpandable: false,
-      isLoading: isLoading,
+        icon: '🟣',
+        color: 'bg-indigo-600',
+        isExpandable: false,
+        isLoading: isLoading,
     },
     {
       id: 'sol',
@@ -178,10 +193,10 @@ export default function WalletPage() {
       symbol: 'SOL',
       balance: '0.00',
       usdValue: 0,
-      icon: '🟠',
-      color: 'bg-orange-500',
-      isExpandable: false,
-      isLoading: false,
+        icon: '🟠',
+        color: 'bg-orange-600',
+        isExpandable: false,
+        isLoading: false,
     },
     {
       id: 'eth',
@@ -189,10 +204,10 @@ export default function WalletPage() {
       symbol: 'ETH',
       balance: '0.00',
       usdValue: 0,
-      icon: '⚪',
-      color: 'bg-gray-400',
-      isExpandable: false,
-      isLoading: false,
+        icon: '⚪',
+        color: 'bg-slate-500',
+        isExpandable: false,
+        isLoading: false,
     },
     {
       id: 'trx',
@@ -201,7 +216,7 @@ export default function WalletPage() {
       balance: '0.00',
       usdValue: 0,
       icon: '🔴',
-      color: 'bg-red-500',
+      color: 'bg-red-600',
       isExpandable: false,
       isLoading: false,
     },
@@ -211,10 +226,10 @@ export default function WalletPage() {
       symbol: 'RUNE',
       balance: '0.00',
       usdValue: 0,
-      icon: '⚡',
-      color: 'bg-green-400',
-      isExpandable: true,
-      isLoading: false,
+        icon: '⚡',
+        color: 'bg-green-500',
+        isExpandable: true,
+        isLoading: false,
     },
     {
       id: 'dash',
@@ -222,10 +237,10 @@ export default function WalletPage() {
       symbol: 'DASH',
       balance: '0.00',
       usdValue: 0,
-      icon: '💙',
-      color: 'bg-blue-500',
-      isExpandable: true,
-      isLoading: false,
+        icon: '💙',
+        color: 'bg-sky-500',
+        isExpandable: true,
+        isLoading: false,
     },
   ]
   
@@ -375,55 +390,73 @@ export default function WalletPage() {
   return (
     <TooltipProvider>
       <div className="min-h-screen bg-gray-950">
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 pt-12">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center">
-              <span className="text-lg">👤</span>
-            </div>
-            <div>
-              <p className="text-white text-sm font-medium">
-                {ensName || formatAddress(walletAddress || '', 6)}
-              </p>
-              {!isCorrectNetwork && (
-                <p className="text-yellow-400 text-xs">Rede Incorreta</p>
-              )}
+        {/* Status Bar - Android Style */}
+        <div className="bg-gray-900 h-6 w-full fixed top-0 left-0 right-0 z-50 flex items-center justify-end px-2">
+          <div className="flex items-center space-x-2">
+            <div className="text-white text-xs">4G</div>
+            <div className="text-white text-xs">100%</div>
+            <div className="w-4 h-3 border border-white rounded-sm flex items-center justify-center">
+              <div className="w-2 h-2 bg-white"></div>
             </div>
           </div>
-          
-          <div className="flex items-center space-x-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-gray-400 hover:text-white p-2"
-            >
-              <Scan className="h-5 w-5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-gray-400 hover:text-white p-2"
-            >
-              <Bell className="h-5 w-5" />
-            </Button>
+        </div>
+        
+        {/* App Bar - Material Design */}
+        <div className="bg-gray-900 shadow-md pt-6 pb-2 px-4 sticky top-0 z-40">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center overflow-hidden">
+                <span className="text-lg">👤</span>
+              </div>
+              <div>
+                <p className="text-white text-sm font-medium">
+                  {ensName || formatAddress(walletAddress || '', 6)}
+                </p>
+                {!isCorrectNetwork && (
+                  <p className="text-amber-400 text-xs font-medium">Rede Incorreta</p>
+                )}
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-gray-300 hover:text-white p-2 rounded-full hover:bg-gray-800 transition-colors"
+              >
+                <Scan className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-gray-300 hover:text-white p-2 rounded-full hover:bg-gray-800 transition-colors"
+              >
+                <Bell className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
         </div>
 
-        {/* Alerta de rede incorreta */}
+        {/* Alerta de rede incorreta - Material Design */}
         {!isCorrectNetwork && (
-          <div className="px-4 mb-4">
-            <Card className="p-4 bg-yellow-900/30 border-yellow-600/50">
+          <div className="px-4 mt-2 mb-4">
+            <Card className="p-4 bg-amber-700/20 border-none rounded-lg shadow-lg overflow-hidden">
               <div className="flex items-center space-x-3">
-                <AlertTriangle className="h-5 w-5 text-yellow-400" />
+                <div className="bg-amber-500/20 p-2 rounded-full">
+                  <AlertTriangle className="h-5 w-5 text-amber-500" />
+                </div>
                 <div className="flex-1">
-                  <p className="text-yellow-200 font-medium text-sm">
+                  <p className="text-amber-100 font-medium text-sm">
                     Conecte-se à rede Polygon
+                  </p>
+                  <p className="text-amber-200/60 text-xs mt-0.5">
+                    Necessário para transações
                   </p>
                 </div>
                 <Button 
                   onClick={switchToPolygon}
                   size="sm"
-                  className="bg-yellow-600 hover:bg-yellow-700 text-white text-xs px-3 py-1"
+                  className="bg-amber-500 hover:bg-amber-600 text-white text-xs px-4 py-2 rounded-full font-medium shadow-md hover:shadow-lg transition-all duration-200 ease-in-out"
                 >
                   Trocar
                 </Button>
@@ -432,51 +465,88 @@ export default function WalletPage() {
           </div>
         )}
 
-        {/* Balance Display */}
-        <div className="px-4 mb-6">
-          <div className="text-center">
-            <p className="text-gray-400 text-sm mb-2">Saldo Atual</p>
-            <div className="flex items-baseline justify-center space-x-2">
-              {isLoading ? (
-                <Skeleton className="h-12 w-48" />
-              ) : (
-                <>
-                  <span className="text-4xl font-bold text-white">
-                    {totalUSDValue.toLocaleString('pt-BR', {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2
-                    })}
-                  </span>
-                  <span className="text-xl text-gray-400 font-medium">USD</span>
-                </>
-              )}
+        {/* Balance Display - Material Design */}
+        <div className="px-4 mt-4 mb-6">
+          <Card className="bg-gradient-to-br from-purple-900 to-purple-800 border-none rounded-xl shadow-lg overflow-hidden">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-purple-200 text-sm font-medium">Saldo Total</p>
+                <Button
+                  onClick={handleRefresh}
+                  disabled={isRefreshing}
+                  variant="ghost"
+                  size="sm"
+                  className="text-purple-200 hover:text-white p-1 rounded-full hover:bg-purple-700/30 transition-colors"
+                >
+                  <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                </Button>
+              </div>
+              
+              <div className="flex items-baseline space-x-2">
+                {isLoading ? (
+                  <Skeleton className="h-12 w-48 bg-purple-300/20" />
+                ) : (
+                  <>
+                    <span className="text-4xl font-bold text-white">
+                      {totalUSDValue.toLocaleString('pt-BR', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                      })}
+                    </span>
+                    <span className="text-xl text-purple-200 font-medium">USD</span>
+                  </>
+                )}
+              </div>
+              
+              <div className="mt-4 pt-4 border-t border-purple-700/50 flex justify-between items-center">
+                <div className="flex space-x-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="bg-purple-700/30 hover:bg-purple-700/50 text-white text-xs px-3 py-1 rounded-full flex items-center space-x-1"
+                  >
+                    <Send className="h-3 w-3 mr-1" />
+                    <span>Enviar</span>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="bg-purple-700/30 hover:bg-purple-700/50 text-white text-xs px-3 py-1 rounded-full flex items-center space-x-1"
+                  >
+                    <Scan className="h-3 w-3 mr-1" />
+                    <span>Receber</span>
+                  </Button>
+                </div>
+                <Badge className="bg-purple-600/50 text-purple-100 text-xs px-2 py-1 rounded-full">
+                  {networkName}
+                </Badge>
+              </div>
             </div>
-            
-            <div className="flex items-center justify-center space-x-2 mt-3">
-              <Button
-                onClick={handleRefresh}
-                disabled={isRefreshing}
-                variant="ghost"
-                size="sm"
-                className="text-gray-400 hover:text-white p-1"
-              >
-                <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-              </Button>
-            </div>
-          </div>
+          </Card>
         </div>
 
-        {/* Tokens List */}
-        <div className="px-4 space-y-3">
+        {/* Tokens List - Material Design */}
+        <div className="px-4 space-y-3 mb-4">
+          <div className="flex items-center justify-between px-1 mb-2">
+            <h2 className="text-white text-lg font-medium">Meus Ativos</h2>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-gray-300 hover:text-white p-1 rounded-full hover:bg-gray-800 transition-colors text-xs"
+            >
+              Ver Todos
+            </Button>
+          </div>
+          
           {tokenList.map((token) => (
             <Card 
               key={token.id} 
-              className="bg-gray-900/60 border-gray-700/50 backdrop-blur-sm overflow-hidden"
+              className="bg-gray-800 border-none rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200 ease-in-out"
             >
               <div className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <div className={`w-10 h-10 ${token.color} rounded-full flex items-center justify-center text-white text-lg`}>
+                    <div className={`w-10 h-10 ${token.color} rounded-full flex items-center justify-center text-white text-lg shadow-md`}>
                       {token.icon}
                     </div>
                     <div>
@@ -487,7 +557,7 @@ export default function WalletPage() {
                             onClick={() => toggleTokenExpansion(token.id)}
                             variant="ghost"
                             size="sm"
-                            className="p-0 h-5 w-5 text-gray-400 hover:text-white"
+                            className="p-0 h-5 w-5 text-gray-300 hover:text-white rounded-full hover:bg-gray-700/50 transition-colors"
                           >
                             {expandedTokens[token.id] ? (
                               <ChevronUp className="h-4 w-4" />
@@ -497,20 +567,20 @@ export default function WalletPage() {
                           </Button>
                         )}
                       </div>
-                      <p className="text-gray-400 text-sm">{token.symbol}</p>
+                      <p className="text-gray-300 text-sm">{token.symbol}</p>
                     </div>
                   </div>
                   
                   <div className="flex items-center space-x-3">
                     <div className="text-right">
                       {token.isLoading ? (
-                        <Skeleton className="h-4 w-16" />
+                        <Skeleton className="h-4 w-16 bg-gray-700" />
                       ) : (
                         <>
                           <p className="text-white font-medium text-sm">
                             {token.balance} {token.symbol}
                           </p>
-                          <p className="text-gray-400 text-xs">
+                          <p className="text-gray-300 text-xs">
                             {formatUSD(token.usdValue)}
                           </p>
                         </>
@@ -520,45 +590,63 @@ export default function WalletPage() {
                     <Toggle
                       pressed={tokenToggles[token.id]}
                       onPressedChange={() => toggleTokenVisibility(token.id)}
-                      className="data-[state=on]:bg-orange-500 data-[state=off]:bg-gray-600 w-10 h-6"
+                      className="data-[state=on]:bg-purple-600 data-[state=off]:bg-gray-600 w-10 h-6 rounded-full"
                     >
-                      <div className="w-4 h-4 bg-white rounded-full transition-transform data-[state=on]:translate-x-2" />
+                      <div className="w-4 h-4 bg-white rounded-full transition-transform data-[state=on]:translate-x-2 shadow-sm" />
                     </Toggle>
                   </div>
                 </div>
                 
-                {/* Expanded Content */}
+                {/* Expanded Content - Material Design */}
                 {expandedTokens[token.id] && (
-                  <div className="mt-4 pt-4 border-t border-gray-700/50">
-                    <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="mt-4 pt-4 border-t border-gray-700/50 animate-fadeIn">
+                    <div className="grid grid-cols-1 gap-4 text-sm">
                       <div>
-                        <p className="text-gray-400 mb-1">Endereço</p>
-                        <div className="flex items-center space-x-2">
+                        <p className="text-gray-300 mb-1 text-xs">Endereço da Carteira</p>
+                        <div className="flex items-center justify-between bg-gray-700/50 p-2 rounded-lg">
                           <p className="text-white font-mono text-xs">
                             {formatAddress(walletAddress || '')}
                           </p>
-                          <Button
-                            onClick={copyAddress}
-                            variant="ghost"
-                            size="sm"
-                            className="p-1 h-6 w-6 text-gray-400 hover:text-white"
-                          >
-                            {copied ? (
-                              <CheckCircle className="h-3 w-3" />
-                            ) : (
-                              <Copy className="h-3 w-3" />
-                            )}
-                          </Button>
+                          <div className="flex space-x-1">
+                            <Button
+                              onClick={copyAddress}
+                              variant="ghost"
+                              size="sm"
+                              className="p-1 h-6 w-6 text-gray-300 hover:text-white rounded-full hover:bg-gray-600/50"
+                            >
+                              {copied ? (
+                                <CheckCircle className="h-3 w-3" />
+                              ) : (
+                                <Copy className="h-3 w-3" />
+                              )}
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="p-1 h-6 w-6 text-gray-300 hover:text-white rounded-full hover:bg-gray-600/50"
+                            >
+                              <ExternalLink className="h-3 w-3" />
+                            </Button>
+                          </div>
                         </div>
                       </div>
-                      <div>
-                        <p className="text-gray-400 mb-1">Rede</p>
-                        <Badge 
-                          variant={isCorrectNetwork ? "default" : "destructive"}
-                          className={`text-xs ${isCorrectNetwork ? "bg-green-600" : ""}`}
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <p className="text-gray-300 mb-1 text-xs">Rede</p>
+                          <Badge 
+                            variant={isCorrectNetwork ? "default" : "destructive"}
+                            className={`text-xs px-2 py-1 rounded-full ${isCorrectNetwork ? "bg-green-600" : "bg-red-600"}`}
+                          >
+                            {networkName}
+                          </Badge>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="bg-gray-700/50 hover:bg-gray-700 text-white text-xs px-3 py-1 rounded-full"
                         >
-                          {networkName}
-                        </Badge>
+                          Detalhes
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -568,55 +656,61 @@ export default function WalletPage() {
           ))}
         </div>
 
-        {/* Bottom Navigation */}
-        <div className="fixed bottom-0 left-0 right-0 bg-gray-900/90 backdrop-blur-sm border-t border-gray-700/50">
-          <div className="flex items-center justify-around py-4 px-6">
+        {/* Bottom Navigation - Material Design */}
+        <div className="fixed bottom-0 left-0 right-0 bg-gray-900 shadow-lg z-50">
+          <div className="flex justify-around items-center py-2 px-1">
             <Button
               variant="ghost"
               size="sm"
-              className="flex flex-col items-center space-y-1 text-orange-500"
-            >
-              <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
-                <Wallet className="h-4 w-4 text-white" />
-              </div>
-              <span className="text-xs">Carteira</span>
-            </Button>
-            
-            <Button
-              variant="ghost"
-              size="sm"
-              className="flex flex-col items-center space-y-1 text-gray-400"
+              className="flex flex-col items-center space-y-1 text-gray-400 hover:text-white rounded-full p-1 transition-colors"
             >
               <Send className="h-5 w-5" />
-              <span className="text-xs">Enviar</span>
+              <span className="text-[10px]">Enviar</span>
             </Button>
             
             <Button
               variant="ghost"
               size="sm"
-              className="flex flex-col items-center space-y-1 text-gray-400"
+              className="flex flex-col items-center space-y-1 text-purple-500 relative"
+            >
+              <div className="absolute -top-1 w-full flex justify-center">
+                <div className="w-8 h-1 bg-purple-500 rounded-full"></div>
+              </div>
+              <Wallet className="h-5 w-5" />
+              <span className="text-[10px]">Carteira</span>
+            </Button>
+            
+            <Button
+              variant="ghost"
+              size="sm"
+              className="flex flex-col items-center space-y-1 text-gray-400 hover:text-white rounded-full p-1 transition-colors"
             >
               <Scan className="h-5 w-5" />
-              <span className="text-xs">Receber</span>
+              <span className="text-[10px]">Receber</span>
             </Button>
             
             <Button
               variant="ghost"
               size="sm"
-              className="flex flex-col items-center space-y-1 text-gray-400"
+              className="flex flex-col items-center space-y-1 text-gray-400 hover:text-white rounded-full p-1 transition-colors"
             >
               <ArrowUpDown className="h-5 w-5" />
-              <span className="text-xs">Trocar</span>
+              <span className="text-[10px]">Trocar</span>
             </Button>
             
             <Button
               variant="ghost"
               size="sm"
-              className="flex flex-col items-center space-y-1 text-gray-400"
+              className="flex flex-col items-center space-y-1 text-gray-400 hover:text-white rounded-full p-1 transition-colors"
             >
               <Settings className="h-5 w-5" />
-              <span className="text-xs">Config</span>
+              <span className="text-[10px]">Config</span>
             </Button>
+          </div>
+          
+          {/* Home Indicator for Android */}
+          <div className="flex justify-center py-1 bg-black">
+            <div className="w-24 h-1 bg-gray-700 rounded-full"></div>
           </div>
         </div>
         

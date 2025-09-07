@@ -75,9 +75,8 @@ export default function MobileRootLayout({
 }>) {
   return (
     <>
-      <AppBar />
+  
       {children}
-      <BottomNavigationBar />
     </>
      
   );

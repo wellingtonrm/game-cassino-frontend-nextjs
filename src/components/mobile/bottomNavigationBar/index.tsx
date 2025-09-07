@@ -1,7 +1,6 @@
 'use client'
 
-import React, { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import React from 'react'
 import { cn } from '@/lib/utils'
 import { RippleButton } from '@/components/ui/RippleButton'
 import { useNavigationStore, type NavigationTab } from '@/stores/navigationStore'
@@ -10,21 +9,18 @@ import { useNavigationStore, type NavigationTab } from '@/stores/navigationStore
 import { Home, Gamepad2, Activity, User, Wallet } from 'lucide-react'
 
 const bottomNavItems = [
-  { icon: Home, label: 'Início', tab: 'home' as NavigationTab, route: '/m' },
-  { icon: Gamepad2, label: 'Cassino', tab: 'casino' as NavigationTab, route: '/m/casino' },
-  { icon: Activity, label: 'Esportes', tab: 'sports' as NavigationTab, route: '/m/sports' },
-  { icon: User, label: 'Perfil', tab: 'profile' as NavigationTab, route: '/m/profile' },
-  { icon: Wallet, label: 'Carteira', tab: 'wallet' as NavigationTab, route: '/m/wallet' },
+  { icon: Home, label: 'Início', tab: 'home' as NavigationTab },
+  { icon: Gamepad2, label: 'Cassino', tab: 'casino' as NavigationTab },
+  { icon: Activity, label: 'Esportes', tab: 'sports' as NavigationTab },
+  { icon: User, label: 'Perfil', tab: 'profile' as NavigationTab },
+  { icon: Wallet, label: 'Carteira', tab: 'wallet' as NavigationTab },
 ]
 
 export default function BottomNavigationBar() {
-  const router = useRouter()
-  const { activeTab, setActiveTab } = useNavigationStore()
+  const { activeTab, setActiveTab } = useNavigationStore();
 
-
-  const handleNavigation = (tab: NavigationTab, route: string) => {
+  const handleNavigation = (tab: NavigationTab) => {
     setActiveTab(tab)
-    router.push(route)
   }
 
   return (
@@ -36,7 +32,7 @@ export default function BottomNavigationBar() {
           return (
             <RippleButton
               key={index}
-              onClick={() => handleNavigation(item.tab, item.route)}
+              onClick={() => handleNavigation(item.tab)}
               className={cn(
                 "relative flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all duration-200 min-w-0",
                 isActive

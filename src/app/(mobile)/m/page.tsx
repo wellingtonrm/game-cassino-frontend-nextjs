@@ -1,7 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import React, { useState, useEffect, Suspense } from 'react'
 import { ChevronDown, Menu, Bell, Home, Gamepad2, Activity, User, Wallet, 
          TrendingUp, Trophy, Target, 
          Zap, Crown, Settings } from 'lucide-react'
@@ -12,6 +11,14 @@ import { useNavigationStore, type NavigationTab } from '@/stores/navigationStore
 import { usePlinkoStore } from '@/stores/plinkoStore'
 import { RippleButton } from '@/components/ui/RippleButton'
 import AppBar from '@/components/mobile/appBar'
+import BottomNavigationBar from '@/components/mobile/bottomNavigationBar'
+
+// Importando os componentes de página
+import HomePage from '@/components/mobile/itensPage/home'
+import CassinoPage from '@/components/mobile/itensPage/cassino'
+import EsportsPage from '@/components/mobile/itensPage/esports'
+import WalletPage from '@/components/mobile/itensPage/wallet'
+import ProfilePage from '@/components/mobile/itensPage/profile'
 
 
 
@@ -47,73 +54,46 @@ const casinoGames = [
 
 
 export default function MobileCasinoPage() {
-  const router = useRouter()
-  const { activeTab, setActiveTab, isDrawerOpen, setDrawerOpen } = useNavigationStore()
+  const { activeTab, isDrawerOpen, setDrawerOpen, isPageLoading, setPageLoading } = useNavigationStore()
   
   // SSR-safe mounting state to prevent hydration mismatches
-  const [isMounted, setIsMounted] = useState(false)
   
-  // Only mount after hydration to avoid SSR mismatch
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
-  
+
   // Acesso ao saldo do usuário para exibição no cabeçalho
   const { balance, formatBalance } = usePlinkoStore()
   
-  // Handle navigation
-  const handleNavigation = (tab: NavigationTab, route: string) => {
-    setActiveTab(tab)
-    if (route !== '/m') { // Don't navigate away from current page if it's casino
-      router.push(route)
+  // Função para renderizar o componente correto com base na aba ativa
+  const renderActiveComponent = () => {
+    switch (activeTab) {
+      case 'home':
+        return <HomePage />
+      case 'casino':
+        return <CassinoPage />
+      case 'sports':
+        return <EsportsPage />
+      case 'wallet':
+        return <WalletPage />
+      case 'profile':
+        return <ProfilePage />
+      default:
+        return <HomePage />
     }
   }
 
   return (
     <div className="min-h-screen bg-[#0f0f23] text-white flex flex-col">
-      {/* Header / App Bar */}
-
-
-      {/* Conteúdo Principal - Otimizado para mobile com visual de aplicativo Android */}
-      <main className="flex-1 overflow-auto pb-16">
-        <div className="p-4">
-          <h1 className="text-2xl font-bold mb-4">Cassino</h1>
-          
-          {/* Lista de Jogos Disponíveis */}
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            {casinoGames.map((game, index) => (
-              <RippleButton
-                key={index}
-                onClick={() => router.push(game.route)}
-                className="bg-[#1a1a2e] rounded-lg p-4 flex flex-col items-center justify-center h-32 border border-gray-800 hover:border-purple-500 transition-colors"
-              >
-                <div className="w-12 h-12 bg-purple-600/20 rounded-full flex items-center justify-center mb-2">
-                  <Gamepad2 className="w-6 h-6 text-purple-400" />
-                </div>
-                <span className="font-medium">{game.name}</span>
-              </RippleButton>
-            ))}
-          </div>
-          
-          {/* Seção de Jogos Populares */}
-          <div className="mb-6">
-            <h2 className="text-xl font-bold mb-3">Jogos Populares</h2>
-            <div className="bg-[#1a1a2e] rounded-lg p-4 border border-gray-800">
-              <p className="text-gray-400">Experimente nosso jogo mais popular:</p>
-              <RippleButton
-                onClick={() => router.push('/m/plinko')}
-                className="w-full mt-3 bg-purple-600 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-2"
-              >
-                <Gamepad2 className="w-5 h-5" />
-                Jogar Plinko
-              </RippleButton>
-            </div>
-          </div>
-        </div>
-      </main>
-
-  
+      {/* App Bar */}
+      <AppBar />
+      
+      {/* Conteúdo Principal - Renderiza o componente ativo com loading */}
      
+       <Suspense fallback={ <div className="flex-1 flex items-center justify-center">
+            <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>}>
+          {renderActiveComponent()}
+      </Suspense>
+      {/* Barra de Navegação Inferior */}
+      <BottomNavigationBar />
     </div>
   )
 }
