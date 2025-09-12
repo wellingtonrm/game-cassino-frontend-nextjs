@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuthStore } from '@/stores/authStore';
+import { useGameAnalytics } from '@/hooks/useGameAnalytics';
 import { 
   Play, 
   Menu,
@@ -12,8 +13,9 @@ import {
 } from 'lucide-react';
 
 export default function PlinkoGamePage() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuthStore();
   const router = useRouter();
+  const { trackGameResult, endGameSession } = useGameAnalytics();
   const [balance, setBalance] = useState(21.38);
   const [betAmount, setBetAmount] = useState(23.71);
   const [gameMode, setGameMode] = useState<'bet' | 'autobet'>('bet');
@@ -31,9 +33,14 @@ export default function PlinkoGamePage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.push('/wallet');
+      router.push('/dashboard');
     }
   }, [isAuthenticated, router]);
+
+  // If user is authenticated, don't render the game
+  if (isAuthenticated) {
+    return null;
+  }
 
   const handleBetChange = (amount: number) => {
     setBetAmount(Math.max(0.01, Math.min(balance, amount)));
@@ -100,6 +107,17 @@ export default function PlinkoGamePage() {
     setGameResult(multiplier);
     
     const payout = betAmount * multiplier;
+    const isWin = payout > betAmount;
+    
+    // Track game result for analytics
+    trackGameResult({
+      gameType: 'plinko',
+      betAmount: betAmount,
+      payout: payout,
+      multiplier: multiplier,
+      outcome: isWin ? 'win' : 'loss',
+      riskLevel: riskLevel as 'low' | 'medium' | 'high'
+    });
     
     setTimeout(() => {
       setBalance(prev => prev - betAmount + payout);
@@ -141,39 +159,10 @@ export default function PlinkoGamePage() {
     }
     
     return pins;
-    // Alternativa: usar o componente PlinkoBoard do diretório plinko
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#1a1a3e] to-[#0f0f23] text-white">
-      {/* HeyBets Header */}
-      <header className="bg-[#1a1a2e] p-4 pt-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Menu size={20} className="text-white" />
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-blue-500 rounded flex items-center justify-center">
-                <span className="text-white font-bold text-xs">H</span>
-              </div>
-              <span className="text-lg font-bold text-white">HeyBets</span>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 bg-orange-600 rounded-lg px-3 py-1.5">
-              <div className="w-2 h-2 bg-white rounded-full"></div>
-              <span className="text-white text-sm font-medium">${balance.toFixed(2)}</span>
-            </div>
-            <button className="bg-blue-600 hover:bg-blue-700 px-4 py-1.5 rounded-lg text-sm font-medium text-white transition-colors">
-              💰
-            </button>
-            <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center">
-              <User size={16} className="text-white" />
-            </div>
-          </div>
-        </div>
-      </header>
-
+    <div className="min-h-screen text-white">
       {/* Game Board */}
       <div className="p-4">
         <div className="relative h-96 bg-gradient-to-b from-[#2a2a4e] to-[#1a1a3e] rounded-xl overflow-hidden border border-gray-700">

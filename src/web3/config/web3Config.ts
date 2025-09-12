@@ -6,7 +6,7 @@ import { QueryClient } from '@tanstack/react-query'
 
 // Configuração do Wagmi com RainbowKit
 export const wagmiConfig = getDefaultConfig({
-  appName: 'Raspadinha Casino',
+  appName: 'PolDex - Premium Casino Platform ',
   projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || 'YOUR_PROJECT_ID',
   chains: [polygon, polygonMumbai],
   ssr: true, // Habilita Server Side Rendering
@@ -150,7 +150,7 @@ export const ERC20_ABI = [
 
 // Configuração do RainbowKit
 export const rainbowKitConfig = {
-  appName: 'Raspadinha Casino',
+  appName: 'PolDex - Premium Casino Platform',
   appDescription: 'Casino online com apostas em USDT na Polygon',
   appUrl: 'https://raspadinha-casino.com',
   appIcon: '/favicon.ico',

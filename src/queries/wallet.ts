@@ -1,58 +1,89 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { WalletBalance, AddMoneyRequest, PaymentResponse, Transaction } from '@/types'
-import { useAuthStore } from '@/stores/auth'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useWalletStore } from '@/stores/wallet'
-import { api } from '@/services/api'
+import { Transaction, AddMoneyRequest, PaymentResponse } from '@/types'
 
-// Wallet API functions
-const walletApi = {
-  getBalance: async (): Promise<WalletBalance> => {
-    const response = await api.get('/wallet/balance')
-    return response.data
-  },
+// Simulated API functions (in a real app, these would call actual API endpoints)
+const fetchWalletBalance = async (): Promise<{ balance: number }> => {
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 500))
   
-  addMoney: async (data: AddMoneyRequest): Promise<PaymentResponse> => {
-    const response = await api.post('/wallet/add-money', data)
-    return response.data
-  },
-  
-  getTransactions: async (): Promise<Transaction[]> => {
-    const response = await api.get('/wallet/transactions')
-    return response.data
-  },
+  // In a real app, this would fetch from an API
+  // For now, we'll return a mock balance
+  return { balance: 100.00 }
 }
 
-// React Query hooks
-export const useWalletBalance = () => {
-  const { isAuthenticated } = useAuthStore()
-  const { setBalance } = useWalletStore()
+const addMoneyToWallet = async (request: AddMoneyRequest): Promise<PaymentResponse> => {
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 1000))
   
+  // In a real app, this would call an API to add money
+  // For now, we'll simulate a successful response
+  return {
+    transactionId: `txn_${Date.now()}`,
+    status: 'pending',
+    paymentUrl: 'https://example.com/payment',
+  }
+}
+
+const fetchTransactions = async (): Promise<Transaction[]> => {
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 500))
+  
+  // In a real app, this would fetch from an API
+  // For now, we'll return mock transactions
+  return [
+    {
+      id: '1',
+      amount: 100,
+      type: 'deposit',
+      status: 'completed',
+      createdAt: new Date().toISOString(),
+      paymentMethod: {
+        id: '1',
+        type: 'pix',
+        name: 'PIX'
+      }
+    }
+  ]
+}
+
+/**
+ * Hook para buscar saldo da carteira
+ */
+export const useWalletBalance = () => {
   return useQuery({
-    queryKey: ['wallet', 'balance'],
-    queryFn: walletApi.getBalance,
-    enabled: isAuthenticated,
-    
+    queryKey: ['walletBalance'],
+    queryFn: fetchWalletBalance,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   })
 }
 
+/**
+ * Hook para adicionar dinheiro à carteira
+ */
 export const useAddMoney = () => {
   const queryClient = useQueryClient()
+  const { addToBalance } = useWalletStore()
   
   return useMutation({
-    mutationFn: walletApi.addMoney,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['wallet', 'balance'] })
-      queryClient.invalidateQueries({ queryKey: ['wallet', 'transactions'] })
+    mutationFn: addMoneyToWallet,
+    onSuccess: (data, variables) => {
+      // Update local balance state
+      addToBalance(variables.amount)
+      
+      // Invalidate and refetch wallet balance
+      queryClient.invalidateQueries({ queryKey: ['walletBalance'] })
     },
   })
 }
 
+/**
+ * Hook para buscar transações
+ */
 export const useTransactions = () => {
-  const { isAuthenticated } = useAuthStore()
-  
   return useQuery({
-    queryKey: ['wallet', 'transactions'],
-    queryFn: walletApi.getTransactions,
-    enabled: isAuthenticated,
+    queryKey: ['transactions'],
+    queryFn: fetchTransactions,
+    staleTime: 1000 * 60 * 10, // 10 minutes
   })
 }

@@ -1,9 +1,67 @@
 import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
-import { isUnauthorizedResponse, handleUnauthorizedError } from '../utils/auth-error-handler';
-import { CookieManager } from '@/lib/cookies';
+import { getCookie } from 'cookies-next';
+import { useAuthStore } from '@/stores/authStore';
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
+// Create axios instance
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 10000,
+});
+
+// Request interceptor to add auth token
+apiClient.interceptors.request.use(
+  (config) => {
+    const { token } = useAuthStore.getState();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor to handle auth errors
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expired or invalid, logout user
+      const { logout } = useAuthStore.getState();
+      logout();
+    }
+    return Promise.reject(error);
+  }
+);
+
+export default apiClient;
 
 /**
- * Configura interceptores para o Axios para tratar automaticamente respostas 401
+ * Verifica se a resposta tem o formato de erro não autorizado
+ */
+const isUnauthorizedResponse = (data: any): data is { code: number; success: boolean; message?: string } => {
+  return data && typeof data === 'object' && 'code' in data && 'success' in data && data.code === 401;
+};
+
+/**
+ * Trata o erro 401 redirecionando para a página de login
+ */
+const handleUnauthorizedError = () => {
+  // Limpar dados de autenticação do estado
+  const { logout } = useAuthStore.getState();
+  logout();
+  
+  // Redirecionar para página de login (no cliente)
+  if (typeof window !== 'undefined') {
+    window.location.href = '/auth';
+  }
+};
+
+/**
+ * Configura interceptadores para o Axios para tratar automaticamente respostas 401
  * @param axiosInstance Instância do Axios para configurar
  * @returns A mesma instância do Axios com os interceptores configurados
  */
@@ -12,7 +70,7 @@ export const setupAxiosInterceptors = (axiosInstance: AxiosInstance): AxiosInsta
   axiosInstance.interceptors.request.use(
     (config) => {
       // Obter token dos cookies (no navegador)
-      const token = CookieManager.getClientCookie("auth-token");
+      const token = getCookie("auth-token");
 
       // Adicionar token ao header de autorização se existir
       if (token) {
@@ -56,7 +114,7 @@ export const setupAxiosInterceptors = (axiosInstance: AxiosInstance): AxiosInsta
  */
 export const createAxiosWithInterceptors = (): AxiosInstance => {
   const instance = axios.create({
-    baseURL: process.env.API_URL || 'http://localhost:3000',
+    baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
     headers: {
       'Content-Type': 'application/json',
     },

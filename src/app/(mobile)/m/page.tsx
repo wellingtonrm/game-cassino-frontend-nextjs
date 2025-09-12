@@ -81,7 +81,7 @@ export default function MobileCasinoPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0f0f23] text-white flex flex-col">
+    <div className="min-h-screen  text-white flex flex-col">
       {/* App Bar */}
       <AppBar />
       

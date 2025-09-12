@@ -4,27 +4,29 @@
  */
 
 export const colors = {
-  // Cores principais
-  primary: '#2C2657',        // Roxo escuro - botões principais, ações primárias
-  secondary: '#D6B897',      // Bege dourado - destaques, links, elementos secundários
-  accent: '#2C2657',         // Cor de destaque (mesmo que primary)
-  logo: '#ffc14f',           // Amarelo dourado da logo - elementos de marca
+  // Cores principais da nova paleta
+  primary: '#121214',        // Preto quase - fundo padrão dark da aplicação
+  secondary: '#fdbf5c',      // Laranja dourado - destaques, links, elementos secundários
+  accent: '#f69a0b',         // Laranja forte - ações importantes, botões principais
+  danger: '#d43a00',         // Laranja vermelho - avisos, erros
+  error: '#9b0800',          // Vermelho escuro - erros críticos
+  logo: '#fdbf5c',           // Amarelo dourado da logo - elementos de marca
   
   // Cores neutras e de fundo
-  lightGray: '#F2F2F2',      // Cinza claro - fundo principal, áreas neutras
+  lightGray: '#F2F2F2',      // Cinza claro - áreas neutras
   mediumGray: '#717171',     // Cinza médio - bordas, texto secundário
-  darkGray: '#0E0E0E',       // Preto quase - texto principal, ênfase
+  darkGray: '#121214',       // Preto quase - fundo padrão dark
   
   // Mapeamento para compatibilidade com código existente
   lightBeige: '#F2F2F2',     // Mapeado para lightGray
-  mediumBeige: '#D6B897',    // Mapeado para secondary
-  darkBrown: '#2C2657',      // Mapeado para primary
-  burnedGold: '#D6B897',     // Mapeado para secondary
+  mediumBeige: '#fdbf5c',    // Mapeado para secondary
+  darkBrown: '#121214',      // Mapeado para primary
+  burnedGold: '#fdbf5c',     // Mapeado para secondary
   
   // Cores de texto
   neutralGray1: '#717171',   // Cinza médio - texto secundário
   neutralGray2: '#717171',   // Cinza médio - linhas, elementos neutros
-  realBlack: '#0E0E0E',      // Preto quase - texto principal, ênfase
+  realBlack: '#121214',      // Preto quase - fundo padrão dark
   
   // Cores de sistema (mantidas para compatibilidade)
   white: '#ffffff',
@@ -32,14 +34,14 @@ export const colors = {
   gray: {
     50: '#F2F2F2',
     100: '#F2F2F2',
-    200: '#D6B897',
-    300: '#D6B897',
+    200: '#fdbf5c',
+    300: '#fdbf5c',
     400: '#717171',
     500: '#717171',
-    600: '#2C2657',
-    700: '#2C2657',
-    800: '#0E0E0E',
-    900: '#0E0E0E',
+    600: '#121214',
+    700: '#121214',
+    800: '#121214',
+    900: '#121214',
   },
 } as const;
 

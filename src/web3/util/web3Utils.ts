@@ -113,9 +113,9 @@ export const polygonConfig: NetworkConfig = {
  * @returns Valor formatado em USD
  */
 export const formatUSD = (amount: number): string => {
-  return new Intl.NumberFormat('pt-BR', {
+  return new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'USDT',
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(amount)
@@ -127,7 +127,7 @@ export const formatUSD = (amount: number): string => {
  * @returns Valor formatado em BRL
  */
 export const formatBRL = (amount: number): string => {
-  return new Intl.NumberFormat('pt-BR', {
+  return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'BRL',
     minimumFractionDigits: 2,
@@ -209,7 +209,7 @@ export const truncateHash = (hash: string, chars: number = 6): string => {
  * @returns Data formatada em português
  */
 export const formatTimestamp = (timestamp: number): string => {
-  return new Date(timestamp * 1000).toLocaleString('pt-BR', {
+  return new Date(timestamp * 1000).toLocaleString('en-US', {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -232,13 +232,13 @@ export const getRelativeTime = (timestamp: number): string => {
   const days = Math.floor(hours / 24)
 
   if (days > 0) {
-    return `${days} dia${days > 1 ? 's' : ''} atrás`
+    return `${days} day${days > 1 ? 's' : ''} ago`
   } else if (hours > 0) {
-    return `${hours} hora${hours > 1 ? 's' : ''} atrás`
+    return `${hours} hour${hours > 1 ? 's' : ''} ago`
   } else if (minutes > 0) {
-    return `${minutes} minuto${minutes > 1 ? 's' : ''} atrás`
+    return `${minutes} minute${minutes > 1 ? 's' : ''} ago`
   } else {
-    return 'Agora mesmo'
+    return 'Just now'
   }
 }
 

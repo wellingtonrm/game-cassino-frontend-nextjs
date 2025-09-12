@@ -2,8 +2,8 @@
 
 import { useReadContract } from 'wagmi'
 import { polygon } from 'wagmi/chains'
-import { networkConfig, ERC20_ABI } from '@/config/web3Config'
-import { formatTokenBalance, balanceToNumber } from '@/lib/web3Utils'
+import { networkConfig, ERC20_ABI } from '@/web3/config/web3Config'
+import { formatTokenBalance, balanceToNumber } from '@/web3/util/web3Utils'
 
 /**
  * Hook especializado para gerenciar saldo USDT

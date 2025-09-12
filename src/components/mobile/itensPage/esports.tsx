@@ -6,34 +6,34 @@ import { RippleButton } from '@/components/ui/RippleButton'
 import { useNavigationStore } from '@/stores/navigationStore'
 
 const sportsEvents = [
-  { name: 'Futebol', matches: 24 },
-  { name: 'Basquete', matches: 12 },
-  { name: 'Tênis', matches: 8 },
+  { name: 'Football', matches: 24 },
+  { name: 'Basketball', matches: 12 },
+  { name: 'Tennis', matches: 8 },
   { name: 'MMA', matches: 5 },
 ]
 
 export default function EsportsPage() {
   const { setPageLoading } = useNavigationStore()
   
-  // Quando o componente é montado, definimos o loading como false
+  // When the component is mounted, set loading to false
   useEffect(() => {
-    // Simula um tempo de carregamento para os componentes
+    // Simulate component loading time
     const timer = setTimeout(() => {
       setPageLoading(false)
-    }, 500) // 500ms de delay para simular carregamento
+    }, 500) // 500ms delay to simulate loading
     
     return () => clearTimeout(timer)
   }, [setPageLoading])
   
   return (
-    <div className="min-h-screen bg-[#0f0f23] text-white flex flex-col">
+    <div className="min-h-screen  text-white flex flex-col">
       <main className="flex-1 overflow-auto pb-16">
         <div className="p-4">
-          <h1 className="text-2xl font-bold mb-4">Esportes</h1>
+          <h1 className="text-2xl font-bold mb-4">Sports</h1>
           
-          {/* Eventos em destaque */}
+          {/* Featured Events */}
           <div className="mb-6">
-            <h2 className="text-xl font-bold mb-3">Eventos em Destaque</h2>
+            <h2 className="text-xl font-bold mb-3">Featured Events</h2>
             <div className="bg-[#1a1a2e] rounded-lg p-4 border border-gray-800">
               <div className="flex items-center justify-between mb-3">
                 <div>
@@ -41,7 +41,7 @@ export default function EsportsPage() {
                   <p className="text-sm text-gray-400">Real Madrid vs Liverpool</p>
                 </div>
                 <div className="bg-purple-600/20 px-3 py-1 rounded-full">
-                  <span className="text-purple-400 text-sm">Hoje 16:00</span>
+                  <span className="text-purple-400 text-sm">Today 16:00</span>
                 </div>
               </div>
               <div className="flex justify-around">
@@ -49,7 +49,7 @@ export default function EsportsPage() {
                   Real Madrid <span className="font-bold ml-1">2.10</span>
                 </RippleButton>
                 <RippleButton className="bg-[#232342] px-4 py-2 rounded-lg text-sm">
-                  Empate <span className="font-bold ml-1">3.25</span>
+                  Draw <span className="font-bold ml-1">3.25</span>
                 </RippleButton>
                 <RippleButton className="bg-[#232342] px-4 py-2 rounded-lg text-sm">
                   Liverpool <span className="font-bold ml-1">2.80</span>
@@ -58,9 +58,9 @@ export default function EsportsPage() {
             </div>
           </div>
           
-          {/* Lista de Esportes */}
+          {/* Sports List */}
           <div className="mb-6">
-            <h2 className="text-xl font-bold mb-3">Esportes Disponíveis</h2>
+            <h2 className="text-xl font-bold mb-3">Available Sports</h2>
             <div className="grid grid-cols-2 gap-4">
               {sportsEvents.map((sport, index) => (
                 <RippleButton
@@ -74,33 +74,33 @@ export default function EsportsPage() {
                     <span className="font-medium">{sport.name}</span>
                   </div>
                   <div className="bg-[#232342] px-2 py-1 rounded-full text-xs text-gray-300">
-                    {sport.matches} jogos
+                    {sport.matches} matches
                   </div>
                 </RippleButton>
               ))}
             </div>
           </div>
           
-          {/* Competições */}
+          {/* Competitions */}
           <div className="mb-6">
-            <h2 className="text-xl font-bold mb-3">Competições</h2>
+            <h2 className="text-xl font-bold mb-3">Competitions</h2>
             <div className="bg-[#1a1a2e] rounded-lg p-4 border border-gray-800">
               <div className="flex items-center mb-3">
                 <Trophy className="w-5 h-5 text-purple-400 mr-2" />
-                <h3 className="font-semibold">Torneios ao Vivo</h3>
+                <h3 className="font-semibold">Live Tournaments</h3>
               </div>
               <div className="space-y-2">
                 <div className="bg-[#232342] p-3 rounded-lg flex justify-between items-center">
                   <span>Copa do Brasil</span>
-                  <span className="text-purple-400 text-sm">8 jogos</span>
+                  <span className="text-purple-400 text-sm">8 matches</span>
                 </div>
                 <div className="bg-[#232342] p-3 rounded-lg flex justify-between items-center">
                   <span>Premier League</span>
-                  <span className="text-purple-400 text-sm">6 jogos</span>
+                  <span className="text-purple-400 text-sm">6 matches</span>
                 </div>
                 <div className="bg-[#232342] p-3 rounded-lg flex justify-between items-center">
                   <span>La Liga</span>
-                  <span className="text-purple-400 text-sm">4 jogos</span>
+                  <span className="text-purple-400 text-sm">4 matches</span>
                 </div>
               </div>
             </div>

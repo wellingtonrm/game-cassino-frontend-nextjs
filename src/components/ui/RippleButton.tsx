@@ -41,7 +41,7 @@ export const RippleButton: React.FC<RippleButtonProps> = ({
 
   return (
     <button
-      className={cn("relative overflow-hidden", className)}
+      className={cn("relative overflow-hidden rounded-lg font-medium transition-all duration-200 transform hover:scale-105 active:scale-95", className)}
       onClick={addRipple}
       {...props}
     >

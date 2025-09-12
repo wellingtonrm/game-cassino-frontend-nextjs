@@ -29,21 +29,21 @@ export const Toggle: React.FC<ToggleProps> = ({
 }) => {
   const baseClasses = [
     'inline-flex items-center justify-center rounded-lg font-medium transition-all duration-200',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fdbf5c]',
     'disabled:pointer-events-none disabled:opacity-50',
     'active:scale-95 transform transition-transform'
   ];
 
   const variants = {
     default: pressed 
-      ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25' 
-      : 'bg-[#2a2a3e] text-gray-300 hover:bg-gray-600 hover:text-white',
+      ? 'bg-[#fdbf5c] text-[#121214] shadow-lg shadow-[#fdbf5c]/25' 
+      : 'bg-[#1A2040] text-gray-300 hover:bg-[#121214] hover:text-white',
     outline: pressed
-      ? 'border-2 border-purple-500 bg-purple-500/10 text-purple-400'
-      : 'border-2 border-gray-600 bg-transparent text-gray-400 hover:border-gray-500 hover:text-gray-300',
+      ? 'border-2 border-[#fdbf5c] bg-[#fdbf5c]/10 text-[#fdbf5c]'
+      : 'border-2 border-[#1A2040] bg-transparent text-gray-400 hover:border-gray-500 hover:text-gray-300',
     ghost: pressed
-      ? 'bg-purple-600/20 text-purple-400'
-      : 'bg-transparent text-gray-400 hover:bg-gray-800/50 hover:text-gray-300'
+      ? 'bg-[#fdbf5c]/20 text-[#fdbf5c]'
+      : 'bg-transparent text-gray-400 hover:bg-[#1A2040] hover:text-gray-300'
   };
 
   const sizes = {
@@ -90,7 +90,7 @@ export const ToggleGroup: React.FC<ToggleGroupProps> = ({
 }) => {
   return (
     <div 
-      className={cn('flex bg-[#2a2a3e] rounded-lg p-1 gap-1', className)}
+      className={cn('flex bg-[#1A2040] rounded-lg p-1 gap-1', className)}
       role="group"
     >
       {React.Children.map(children, (child) => {
@@ -133,8 +133,8 @@ export const ToggleGroupItem: React.FC<ToggleGroupItemProps> = ({
       disabled={disabled}
       variant="ghost"
       className={cn(
-        'flex-1 data-[state=on]:bg-purple-600 data-[state=on]:text-white',
-        pressed && 'bg-purple-600 text-white',
+        'flex-1 data-[state=on]:bg-[#fdbf5c] data-[state=on]:text-[#121214]',
+        pressed && 'bg-[#fdbf5c] text-[#121214]',
         className
       )}
       {...props}

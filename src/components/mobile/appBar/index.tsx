@@ -1,70 +1,56 @@
 "use client";
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
-import { ChevronDown, Bell } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Logo from '@/components/Logo';
-import { RippleButton } from '@/components/ui/RippleButton';
-import { useAuthStore } from '@/stores/auth';
-import { useAuth } from '@/hooks/useAuth';
+import WalletDrawer from './walletDrawer';
+import { useAccountWallet } from '@/hooks/useAccountWallet';
+import { Button } from '@/components/ui/button';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { Wallet } from 'lucide-react';
 
 interface AppBarProps {
-  balance?: number;
-  onOpenWallet?: () => void;
   className?: string;
 }
 
 const AppBar: React.FC<AppBarProps> = ({ 
-  balance = 0, 
-  onOpenWallet,
   className 
 }) => {
-  const router = useRouter();
-  const { isAuthenticated, user } = useAuthStore();
-  const { logout } = useAuth();
+  const { hasWalletSession } = useAccountWallet();
 
-  // Formatar saldo com 2 casas decimais
-  const formatBalance = (value: number) => {
-    return value.toFixed(2);
-  };
-
-  // Definição dos itens de menu removida conforme solicitado
-
- 
   return (
-    <header className={cn(
-      "bg-[#1a1a2e] border-b border-gray-800 px-4 py-3 flex items-center justify-between shadow-lg sticky top-0 z-50",
-      className
-    )}>
-   
-      
-      {/* Logo */}
-      <Logo size="md" />
-      
-      {/* Ações do Cabeçalho */}
-      <div className="flex items-center gap-3">
-        {/* Saldo com ícone de USDT */}
-        <RippleButton 
-          onClick={onOpenWallet}
-          className="flex items-center gap-2 bg-[#2a2a3e] hover:bg-[#32324a] rounded-lg px-3 py-2 transition-colors"
-        >
-          <div className="w-5 h-5 rounded-full bg-[#26A17B] flex items-center justify-center">
-            <span className="text-xs font-bold text-white">₮</span>
-          </div>
-          <span className="text-sm font-mono">{isAuthenticated ? formatBalance(balance) : '0.00'}</span>
-          <ChevronDown className="w-4 h-4" />
-        </RippleButton>
+    <>
+      <header className={cn(
+        "backdrop-blur-lg px-4 py-3 flex items-center justify-between shadow-lg sticky top-0 z-50 border-b border-[#1A2040]",
+        className
+      )}>
+        {/* Logo */}
+        <Logo />
         
-        {/* Botão de Notificações */}
-        <RippleButton className="p-2 rounded-full hover:bg-gray-800 transition-colors relative">
-          <Bell className="w-6 h-6" />
-          <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full" />
-        </RippleButton>
-        
-
-      </div>
-    </header>
+        {/* Header Actions */}
+        <div className="flex items-center gap-3">
+          {/* Wallet Icon Button */}
+          {hasWalletSession() ? (
+           <WalletDrawer /> 
+          ):(
+          <ConnectButton.Custom>
+            {({ openConnectModal }) => (
+              <Button 
+                onClick={openConnectModal}
+                className="w-full bg-gradient-to-r from-[#fdbf5c] to-[#f69a0b] hover:from-[#f69a0b] hover:to-[#fdbf5c] text-[#121214] font-semibold py-2 px-4 rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-[#fdbf5c]/25 flex items-center"
+                size="lg"
+              >
+                <Wallet className="mr-2 h-5 w-5" />
+                Connect Wallet
+              </Button>
+            )}
+          </ConnectButton.Custom>
+          )}
+        </div>
+      </header>
+      
+      
+    </>
   );
 };
 

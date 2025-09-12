@@ -1,12 +1,20 @@
 @import "tailwindcss";
+@import "@rainbow-me/rainbowkit/styles.css";
 
 :root {
+  /* New Color Palette */
+  --primary: #121214;
+  --secondary: #fdbf5c;
+  --accent: #f69a0b;
+  --danger: #d43a00;
+  --error: #9b0800;
+  
   /* Dark Woods Theme */
   --casino-primary: #3747A6;
   --casino-secondary: #263173;
   --casino-tertiary: #1D2659;
   --casino-quaternary: #1A2040;
-  --casino-dark: #151826;
+  --casino-dark: #0d0f12;
   
   /* It's Getting Loud Theme */
   --casino-red: #A60321;
@@ -20,25 +28,25 @@
   --casino-gold-dark: #B8860B;
   
   /* Main Theme Variables */
-  --background: var(--casino-dark);
+  --background: var(--primary);
   --foreground: var(--casino-light);
   --primary: var(--casino-primary);
   --primary-foreground: #ffffff;
-  --secondary: var(--casino-secondary);
-  --secondary-foreground: var(--casino-light);
-  --accent: var(--casino-gold);
-  --accent-foreground: var(--casino-dark);
-  --destructive: var(--casino-red);
+  --secondary: var(--secondary);
+  --secondary-foreground: #121214;
+  --accent: var(--accent);
+  --accent-foreground: #ffffff;
+  --destructive: var(--danger);
   --destructive-foreground: #ffffff;
-  --border: var(--casino-quaternary);
-  --input: var(--casino-tertiary);
-  --ring: var(--casino-primary);
+  --border: #1A2040;
+  --input: #1D2659;
+  --ring: #3747A6;
   
   /* Casino specific colors */
-  --casino-gradient-start: var(--casino-dark);
+  --casino-gradient-start: var(--primary);
   --casino-gradient-end: var(--casino-primary);
-  --casino-card-bg: var(--casino-quaternary);
-  --casino-hover: var(--casino-tertiary);
+  --casino-card-bg: #1A2040;
+  --casino-hover: #1D2659;
 }
 
 @theme inline {
@@ -53,7 +61,6 @@
 }
 
 body {
-  background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
@@ -145,6 +152,25 @@ body {
 .border-casino-tertiary { border-color: var(--casino-tertiary); }
 .border-casino-quaternary { border-color: var(--casino-quaternary); }
 .border-casino-gold { border-color: var(--casino-gold); }
+
+/* Custom color utility classes for the new palette */
+.bg-primary { background-color: #121214; }
+.bg-secondary { background-color: #fdbf5c; }
+.bg-accent { background-color: #f69a0b; }
+.bg-danger { background-color: #d43a00; }
+.bg-error { background-color: #9b0800; }
+
+.text-primary { color: #121214; }
+.text-secondary { color: #fdbf5c; }
+.text-accent { color: #f69a0b; }
+.text-danger { color: #d43a00; }
+.text-error { color: #9b0800; }
+
+.border-primary { border-color: #121214; }
+.border-secondary { border-color: #fdbf5c; }
+.border-accent { border-color: #f69a0b; }
+.border-danger { border-color: #d43a00; }
+.border-error { border-color: #9b0800; }
 
 /* Casino Gradients */
 .bg-casino-gradient {

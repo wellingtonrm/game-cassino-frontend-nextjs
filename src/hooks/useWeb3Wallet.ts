@@ -10,8 +10,8 @@ import {
   isPolygonNetwork, 
   getMockPrices,
   calculateUSDValue 
-} from '@/lib/web3Utils'
-import { networkConfig, ERC20_ABI } from '@/config/web3Config'
+} from '@/web3/util/web3Utils'
+import { networkConfig, ERC20_ABI } from '@/web3/config/web3Config'
 import { TokenBalance } from '@/types'
 
 /**
