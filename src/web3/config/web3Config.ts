@@ -7,20 +7,49 @@ import { QueryClient } from '@tanstack/react-query'
 // Configuração do Wagmi com RainbowKit
 export const wagmiConfig = getDefaultConfig({
   appName: 'PolDex - Premium Casino Platform ',
-  projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || 'YOUR_PROJECT_ID',
+  projectId: process.env.WALLET_CONNECT_PROJECT_ID || 'YOUR_PROJECT_ID',
   chains: [polygon, polygonMumbai],
   ssr: true, // Habilita Server Side Rendering
 })
 
-// Cliente do React Query para Web3
+// Cliente do React Query para Web3 with improved error handling
 export const web3QueryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 1000 * 60 * 5, // 5 minutos
       gcTime: 1000 * 60 * 30, // 30 minutos
-      retry: 3,
+      retry: (failureCount, error) => {
+        // Don't retry on network errors or when connection is interrupted
+        if (error instanceof Error && 
+            (error.message.includes('interrupted') || 
+             error.message.includes('network') || 
+             error.message.includes('WebSocket') ||
+             error.message.includes('fetch') ||
+             error.message.includes('Failed to fetch'))) {
+          return false;
+        }
+        // Retry up to 3 times for other errors
+        return failureCount < 3;
+      },
       refetchOnWindowFocus: false,
+      refetchOnReconnect: 'always',
+      networkMode: 'always',
     },
+    mutations: {
+      retry: (failureCount, error) => {
+        // Don't retry on network errors
+        if (error instanceof Error && 
+            (error.message.includes('interrupted') || 
+             error.message.includes('network') || 
+             error.message.includes('WebSocket') ||
+             error.message.includes('fetch') ||
+             error.message.includes('Failed to fetch'))) {
+          return false;
+        }
+        // Retry up to 2 times for other errors
+        return failureCount < 2;
+      }
+    }
   },
 })
 

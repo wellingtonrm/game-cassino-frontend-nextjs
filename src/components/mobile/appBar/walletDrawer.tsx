@@ -21,11 +21,16 @@ const WalletDrawer = ()=> {
     const {
         address,
         balances,
-        totalUSDValue,
         isCorrectNetwork,
-        networkName,
         disconnect
     } = useWeb3Wallet()
+
+    // Calculate total USD value from individual balances
+    const totalUSDValue = (balances?.matic?.usdValue !== undefined ? parseFloat(balances.matic.usdValue.toString()) : 0) + 
+                          (balances?.usdt?.usdValue !== undefined ? parseFloat(balances.usdt.usdValue.toString()) : 0);
+    
+    // Provide default network name
+    const networkName = 'Polygon';
 
     // Only show the drawer if there's a valid wallet session
     const shouldShowDrawer = !!(hasWalletSession() && address)

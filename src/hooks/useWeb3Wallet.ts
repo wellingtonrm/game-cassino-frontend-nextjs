@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useRef } from 'react'
 import { useAccount, useBalance, useDisconnect, useEnsName, useReadContract, useChainId } from 'wagmi'
 import { polygon } from 'wagmi/chains'
 import { useWeb3WalletStore } from '@/stores/web3Wallet'
@@ -11,8 +11,42 @@ import {
   getMockPrices,
   calculateUSDValue 
 } from '@/web3/util/web3Utils'
-import { networkConfig, ERC20_ABI } from '@/web3/config/web3Config'
+import { networkConfig } from '@/web3/config/web3Config'
 import { TokenBalance } from '@/types'
+
+// ABI mínimo do ERC-20 para USDT
+const ERC20_ABI = [
+  {
+    constant: true,
+    inputs: [{ name: '_owner', type: 'address' }],
+    name: 'balanceOf',
+    outputs: [{ name: 'balance', type: 'uint256' }],
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'decimals',
+    outputs: [{ name: '', type: 'uint8' }],
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'symbol',
+    outputs: [{ name: '', type: 'string' }],
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'name',
+    outputs: [{ name: '', type: 'string' }],
+    type: 'function',
+  },
+] as const
+
+import { useNetworkStatus } from './useNetworkStatus'
 
 /**
  * Hook principal para gerenciar estado da carteira Web3
@@ -20,6 +54,8 @@ import { TokenBalance } from '@/types'
  */
 export const useWeb3Wallet = () => {
   const { disconnect } = useDisconnect()
+  const { isOnline, connectionStatus } = useNetworkStatus()
+  const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   
   // Estado da carteira Web3 do Zustand
   const {
@@ -48,19 +84,50 @@ export const useWeb3Wallet = () => {
   const { data: ensData } = useEnsName({ address: wagmiAccount.address })
   
   // Saldo MATIC nativo
-  const { data: maticBalanceData, refetch: refetchMaticBalance } = useBalance({
+  const { data: maticBalanceData, refetch: refetchMaticBalance, isError: isMaticBalanceError } = useBalance({
     address: wagmiAccount.address,
     chainId: polygon.id,
+    // Add query settings for offline support
+    query: {
+      enabled: isOnline && wagmiAccount.address !== undefined,
+      gcTime: 1000 * 60 * 60 * 24, // 24 hours
+      staleTime: 1000 * 60 * 5, // 5 minutes
+    }
   })
 
   // Saldo USDT (ERC-20)
-  const { data: usdtBalanceData, refetch: refetchUSDTBalance } = useReadContract({
+  const { data: usdtBalanceData, refetch: refetchUSDTBalance, isError: isUSDTBalanceError } = useReadContract({
     address: networkConfig.polygon.contracts.usdt.address,
     abi: ERC20_ABI,
     functionName: 'balanceOf',
     args: wagmiAccount.address ? [wagmiAccount.address] : undefined,
     chainId: polygon.id,
+    // Add query settings for offline support
+    query: {
+      enabled: isOnline && wagmiAccount.address !== undefined,
+      gcTime: 1000 * 60 * 60 * 24, // 24 hours
+      staleTime: 1000 * 60 * 5, // 5 minutes
+    }
   })
+
+  // Clear retry timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  // Handle network status changes
+  useEffect(() => {
+    if (!isOnline && isConnected) {
+      setError('Connection lost. Please check your internet connection.')
+    } else if (isOnline && error && error.includes('Connection lost')) {
+      // Clear connection lost error when back online
+      setError(null)
+    }
+  }, [isOnline, isConnected, error, setError])
 
   // Sincroniza estado da conexão com Wagmi
   useEffect(() => {
@@ -80,16 +147,32 @@ export const useWeb3Wallet = () => {
     if (maticBalanceData) {
       const formattedBalance = formatTokenBalance(maticBalanceData.value, 18, 4)
       setMaticBalance(formattedBalance)
+    } else if (isMaticBalanceError && connectionStatus === 'online') {
+      // Retry after a delay if there was an error and we're online
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current)
+      }
+      retryTimeoutRef.current = setTimeout(() => {
+        refetchMaticBalance()
+      }, 5000)
     }
-  }, [maticBalanceData, setMaticBalance])
+  }, [maticBalanceData, isMaticBalanceError, connectionStatus, setMaticBalance, refetchMaticBalance])
 
   // Atualiza saldo USDT
   useEffect(() => {
     if (usdtBalanceData) {
       const formattedBalance = formatTokenBalance(usdtBalanceData as bigint, 6, 2)
       setUSDTBalance(formattedBalance)
+    } else if (isUSDTBalanceError && connectionStatus === 'online') {
+      // Retry after a delay if there was an error and we're online
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current)
+      }
+      retryTimeoutRef.current = setTimeout(() => {
+        refetchUSDTBalance()
+      }, 5000)
     }
-  }, [usdtBalanceData, setUSDTBalance])
+  }, [usdtBalanceData, isUSDTBalanceError, connectionStatus, setUSDTBalance, refetchUSDTBalance])
 
   // Atualiza ENS name
   useEffect(() => {
@@ -112,6 +195,11 @@ export const useWeb3Wallet = () => {
 
   // Função para atualizar saldos manualmente
   const refreshBalances = useCallback(async () => {
+    if (!isOnline) {
+      setError('Cannot refresh balances while offline')
+      return
+    }
+
     try {
       setLoading(true)
       await Promise.all([
@@ -125,7 +213,7 @@ export const useWeb3Wallet = () => {
     } finally {
       setLoading(false)
     }
-  }, [refetchMaticBalance, refetchUSDTBalance, updateSession, setLoading, setError])
+  }, [isOnline, refetchMaticBalance, refetchUSDTBalance, updateSession, setLoading, setError])
 
   // Verifica se está na rede correta
   const isCorrectNetwork = isPolygonNetwork(chainId || 0)
@@ -160,23 +248,22 @@ export const useWeb3Wallet = () => {
     isConnected,
     chainId,
     connector,
+    
+    // Estados
     isLoading,
     error,
-    isCorrectNetwork,
-
+    isOnline,
+    connectionStatus,
+    
     // Saldos
-    balances: formattedBalances,
     maticBalance,
     usdtBalance,
-    totalUSDValue: maticUSDValue + usdtUSDValue,
-
+    balances: formattedBalances,
+    isCorrectNetwork,
+    
     // Funções
     disconnect: handleDisconnect,
     refreshBalances,
     clearError: () => setError(null),
-
-    // Informações da rede
-    networkName: chainId ? (chainId === 137 ? 'Polygon' : `Rede ${chainId}`) : null,
-    blockExplorerUrl: chainId === 137 ? 'https://polygonscan.com' : null,
   }
 }

@@ -18,3 +18,13 @@ export function formatDate(date: Date): string {
   }).format(date)
 }
 
+/**
+ * Formata um endereço de carteira para exibição
+ * @param address Endereço completo
+ * @param chars Número de caracteres a mostrar no início e fim
+ * @returns Endereço formatado (ex: 0x1234...5678)
+ */
+export function formatAddress(address: string, chars: number = 4): string {
+  if (!address || address.length < chars * 2 + 2) return address
+  return `${address.substring(0, chars + 2)}...${address.substring(address.length - chars)}`
+}

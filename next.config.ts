@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
   env: {
     API_URL: process.env.API_URL,
     JWT_SECRET: process.env.JWT_SECRET,
+    WALLET_CONNECT_PROJECT_ID:process.env.WALLET_CONNECT_PROJECT_ID,
   },
   // PWA Configuration
   experimental: {
