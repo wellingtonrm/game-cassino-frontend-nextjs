@@ -33,25 +33,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   });
 
 
-  const isVerefildAddressCookies = (address?: string):boolean => {
+  const isVerefildAddressCookies = useCallback((address?: string):boolean => {
      const savedAddress = Cookies.get('wallet_address');
     return savedAddress ? address === savedAddress : false;
-  }
-  const isVefildAccessTokenCookies = ():boolean => {
+  }, []);
+  
+  const isVefildAccessTokenCookies = useCallback(():boolean => {
     const savedAccessToken = Cookies.get('wallet_acessToken');
     return savedAccessToken ? true : false;
-  }
+  }, []);
 
   // Inicializar estado a partir dos cookies
   useEffect(() => {
-    if (isVerefildAddressCookies(address)) {
-      if (isVefildAccessTokenCookies()) {
-        setAuthState(prev => ({
-          ...prev,
-          isAuthenticated: true,
-          address: address!
-        }));
-      }
+    if (address && isVerefildAddressCookies(address) && isVefildAccessTokenCookies()) {
+      setAuthState(prev => ({
+        ...prev,
+        isAuthenticated: true,
+        address: address
+      }));
     }
   }, [address, isVerefildAddressCookies, isVefildAccessTokenCookies]);
 
@@ -84,7 +83,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           });
           
           // Salvar nos cookies (tokens são gerenciados automaticamente via cookies HTTP)
-          Cookies.set('wallet_acessToken',  resultlogin.data.accessToken, { expires: 7 });
+          Cookies.set('wallet_acessToken', response.data.accessToken, { expires: 7 });
           Cookies.set('wallet_address', address, { expires: 7 });
           console.log('Login realizado com sucesso');
         },
@@ -110,8 +109,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
     
     // Limpar cookies
-    Cookies.remove('access_token');
     Cookies.remove('wallet_address');
+    Cookies.remove('wallet_acessToken');
   }, []);
 
   // Auto-autenticar quando wallet conecta e nonce está disponível

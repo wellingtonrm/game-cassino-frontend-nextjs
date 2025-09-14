@@ -108,17 +108,17 @@ export const polygonConfig: NetworkConfig = {
 }
 
 /**
- * Formata valor em USD
+ * Formata valor em USDT
  * @param amount - Valor numérico
- * @returns Valor formatado em USD
+ * @returns Valor formatado em USDT
  */
 export const formatUSD = (amount: number): string => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USDT',
+  const formatted = new Intl.NumberFormat('en-US', {
+    style: 'decimal',
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(amount)
+  return `${formatted} USDT`
 }
 
 /**
