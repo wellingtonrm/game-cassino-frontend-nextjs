@@ -1,16 +1,29 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { authApi } from '@/services/auth';
-import { useAuthStore } from '@/stores/authStore';
+import { api } from '@/services/api';
+
+interface NonceResponse {
+  nonce?: string;
+}
+interface AuthResponse {
+  accessToken: string;
+  refreshToken: string;
+}
+interface ApiResponse<T> {
+  data: T;
+  message: string;
+  status: number;
+}
 
 /**
  * Hook to get nonce for wallet authentication
  */
-export const useNonce = (address: string | undefined) => {
+export const useNonceQuery = (address: string) => {
   return useQuery({
-    queryKey: ['nonce', address],
-    queryFn: () => {
+    queryKey: ['nonce-address', address],
+    queryFn: async () => {
       if (!address) throw new Error('Address is required');
-      return authApi.getNonce(address);
+     const {data} = await  api.get<ApiResponse<NonceResponse>>(`/auth/nonce/${address}`);
+    return data ;
     },
     enabled: !!address,
     staleTime: 1000 * 60 * 5, // 5 minutes
@@ -22,16 +35,45 @@ export const useNonce = (address: string | undefined) => {
  */
 export const useLogin = () => {
   const queryClient = useQueryClient();
-  const setAuthenticated = useAuthStore((state) => state.setAuthenticated);
-  
   return useMutation({
-    mutationFn: ({ address, signature }: { address: string; signature: string }) => 
-      authApi.login(address, signature),
+    mutationFn: async (
+      { signature, address }: { signature: string; address: string }) => {
+      const {data} = await api.post<ApiResponse<AuthResponse>>('/auth/login', { signature, address });
+      return data;
+    },
     onSuccess: (data, variables) => {
-      // Store the JWT token and address
-      setAuthenticated(data.token, variables.address);
-      
+      // Update authentication state (tokens are handled by cookies)
+     // setAuthenticated(variables.address);
+
       // Invalidate and refetch relevant queries
+      queryClient.invalidateQueries({ queryKey: ['auth'] });
+    },
+  });
+};
+
+/**
+ * Hook to refresh access token
+ */
+export const useRefreshToken = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => api.post('/auth/refresh'),
+    onSuccess: () => {
+      // Tokens are handled by cookies, just invalidate queries
+      queryClient.invalidateQueries({ queryKey: ['auth'] });
+    },
+  });
+};
+
+/**
+ * Hook to logout
+ */
+export const useLogout = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => api.post('/auth/logout'),
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['auth'] });
     },
   });

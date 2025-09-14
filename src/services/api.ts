@@ -1,80 +1,30 @@
 import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
-import { getCookie } from 'cookies-next';
-import { useAuthStore } from '@/stores/authStore';
+import { AuthCookies } from '@/lib/cookies';
+import { logout } from '@/lib/logout';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-
-// Create axios instance
-const apiClient = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 10000,
-});
-
-// Request interceptor to add auth token
-apiClient.interceptors.request.use(
-  (config) => {
-    const { token } = useAuthStore.getState();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Response interceptor to handle auth errors
-apiClient.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Token expired or invalid, logout user
-      const { logout } = useAuthStore.getState();
-      logout();
-    }
-    return Promise.reject(error);
-  }
-);
-
-export default apiClient;
+const API_BASE_URL = process.env.API_URL || 'http://localhost:3001';
 
 /**
- * Verifica se a resposta tem o formato de erro não autorizado
+ * Manipula erros de autorização fazendo logout do usuário
  */
-const isUnauthorizedResponse = (data: any): data is { code: number; success: boolean; message?: string } => {
-  return data && typeof data === 'object' && 'code' in data && 'success' in data && data.code === 401;
-};
-
-/**
- * Trata o erro 401 redirecionando para a página de login
- */
-const handleUnauthorizedError = () => {
-  // Limpar dados de autenticação do estado
-  const { logout } = useAuthStore.getState();
+const handleUnauthorizedError = (): void => {
   logout();
-  
-  // Redirecionar para página de login (no cliente)
-  if (typeof window !== 'undefined') {
-    window.location.href = '/auth';
-  }
 };
 
+
 /**
- * Configura interceptadores para o Axios para tratar automaticamente respostas 401
- * @param axiosInstance Instância do Axios para configurar
- * @returns A mesma instância do Axios com os interceptores configurados
+ * Configura interceptadores para uma instância do Axios
  */
-export const setupAxiosInterceptors = (axiosInstance: AxiosInstance): AxiosInstance => {
+const setupAxiosInterceptors = (axiosInstance: AxiosInstance): AxiosInstance => {
   // Interceptor de requisição para adicionar token de autenticação
   axiosInstance.interceptors.request.use(
     (config) => {
-      // Obter token dos cookies (no navegador)
-      const token = getCookie("auth-token");
+      // Obter token dos cookies usando AuthCookies
+      const accessToken = AuthCookies.getAccessToken();
 
       // Adicionar token ao header de autorização se existir
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+      if (accessToken) {
+        config.headers.Authorization = `Bearer ${accessToken}`;
       }
       
       return config;
@@ -84,22 +34,47 @@ export const setupAxiosInterceptors = (axiosInstance: AxiosInstance): AxiosInsta
     }
   );
 
-  // Interceptor de resposta
+  // Interceptor de resposta para lidar com erros de autenticação
   axiosInstance.interceptors.response.use(
-    // Caso de sucesso
     (response: AxiosResponse) => {
       return response;
     },
-    // Caso de erro
-    (error: AxiosError) => {
-      // Verificar se é erro 401
-      if (error.response?.status === 401) {
-        const responseData = error.response.data;
-
-        // Verificar se a resposta tem o formato esperado e tratar
-        if (isUnauthorizedResponse(responseData)) {
+    async (error: AxiosError) => {
+      const originalRequest = error.config as any;
+      
+      // Se erro é 401 e ainda não tentamos atualizar o token
+      if (error.response?.status === 401 && !originalRequest._retry) {
+        originalRequest._retry = true;
+        
+        try {
+          const refreshToken = AuthCookies.getRefreshToken();
+          
+          // Se não temos refresh token, faz logout
+          if (!refreshToken) {
+            handleUnauthorizedError();
+            return Promise.reject(error);
+          }
+          
+          // Tenta atualizar o token
+          const refreshResponse = await axios.post(`${API_BASE_URL}/auth/refresh`, {
+            refreshToken
+          });
+          
+          const { accessToken } = refreshResponse.data;
+          
+          // Refaz a requisição original com o novo token
+          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+          return axiosInstance(originalRequest);
+        } catch (refreshError) {
+          // Se falhar em atualizar, faz logout
           handleUnauthorizedError();
+          return Promise.reject(refreshError);
         }
+      }
+      
+      // Para outros erros 401, redireciona para login
+      if (error.response?.status === 401) {
+        handleUnauthorizedError();
       }
 
       return Promise.reject(error);
@@ -110,11 +85,12 @@ export const setupAxiosInterceptors = (axiosInstance: AxiosInstance): AxiosInsta
 };
 
 /**
- * Cria uma instância do Axios com interceptores configurados
+ * Cria uma instância do Axios com interceptadores configurados
  */
-export const createAxiosWithInterceptors = (): AxiosInstance => {
+const createAxiosWithInterceptors = (): AxiosInstance => {
   const instance = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
+    baseURL: API_BASE_URL,
+    timeout: 10000,
     headers: {
       'Content-Type': 'application/json',
     },
@@ -125,3 +101,4 @@ export const createAxiosWithInterceptors = (): AxiosInstance => {
 
 // Exportar uma instância padrão já configurada
 export const api = createAxiosWithInterceptors();
+export default api;

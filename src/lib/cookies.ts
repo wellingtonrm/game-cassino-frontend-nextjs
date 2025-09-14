@@ -188,6 +188,13 @@ export class AuthCookies {
   }
 
   /**
+   * Obtém o refresh token
+   */
+  static getRefreshToken(): string | undefined {
+    return CookieManager.getClientCookie(this.REFRESH_TOKEN_KEY);
+  }
+
+  /**
    * Obtém dados do usuário
    */
   static getUserData(): Record<string, unknown> | object | undefined {
@@ -207,6 +214,7 @@ export class AuthCookies {
    */
   static clearAuthCookies(): void {
     CookieManager.removeClientCookie(this.ACCESS_TOKEN_KEY);
+    CookieManager.removeClientCookie(this.REFRESH_TOKEN_KEY);
     CookieManager.removeClientCookie(this.USER_DATA_KEY);
   }
 

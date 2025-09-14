@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/stores/authStore';
 import { useGameAnalytics } from '@/hooks/useGameAnalytics';
 import { 
   Play, 
@@ -13,7 +12,7 @@ import {
 } from 'lucide-react';
 
 export default function PlinkoGamePage() {
-  const { isAuthenticated } = useAuthStore();
+  
   const router = useRouter();
   const { trackGameResult, endGameSession } = useGameAnalytics();
   const [balance, setBalance] = useState(21.38);
@@ -30,17 +29,6 @@ export default function PlinkoGamePage() {
   // Exactly 9 multiplier slots as shown in image
   const multipliers = [8.9, 3, 1.4, 1.2, 1.1, 1.2, 1.4, 3, 8.9];
   const lastResults = [8.9, 1.1, 1.2, 1.4];
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.push('/dashboard');
-    }
-  }, [isAuthenticated, router]);
-
-  // If user is authenticated, don't render the game
-  if (isAuthenticated) {
-    return null;
-  }
 
   const handleBetChange = (amount: number) => {
     setBetAmount(Math.max(0.01, Math.min(balance, amount)));
@@ -109,15 +97,7 @@ export default function PlinkoGamePage() {
     const payout = betAmount * multiplier;
     const isWin = payout > betAmount;
     
-    // Track game result for analytics
-    trackGameResult({
-      gameType: 'plinko',
-      betAmount: betAmount,
-      payout: payout,
-      multiplier: multiplier,
-      outcome: isWin ? 'win' : 'loss',
-      riskLevel: riskLevel as 'low' | 'medium' | 'high'
-    });
+   
     
     setTimeout(() => {
       setBalance(prev => prev - betAmount + payout);

@@ -1,67 +1,77 @@
-import { useEffect, useRef } from 'react';
-import { useRecordGameResult, useStartSession, useEndSession } from '@/queries/analytics';
-import { useAuthStore } from '@/stores/authStore';
-import { useSessionStore } from '@/stores/sessionStore';
+'use client';
 
-interface GameResult {
-  gameType: string;
-  betAmount: number;
-  payout: number;
-  multiplier: number;
-  outcome: 'win' | 'loss';
-  riskLevel: 'low' | 'medium' | 'high';
-}
+import { useCallback } from 'react';
 
+/**
+ * Hook para análise de jogos
+ * Rastreia resultados de jogos e sessões
+ */
 export const useGameAnalytics = () => {
-  const { address } = useAuthStore();
-  const { sessionId, isActive, startSession, endSession } = useSessionStore();
-  const { mutate: recordGameResult } = useRecordGameResult();
-  const { mutate: startSessionMutation } = useStartSession();
-  const { mutate: endSessionMutation } = useEndSession();
-  
-  // Ref to track if session has been started
-  const sessionStarted = useRef(false);
-
-  // Start session when user authenticates
-  useEffect(() => {
-    if (address && !sessionStarted.current && !isActive) {
-      startSessionMutation(address, {
-        onSuccess: (data) => {
-          if (data.sessionId) {
-            startSession(data.sessionId);
-            sessionStarted.current = true;
-          }
-        }
-      });
-    }
-  }, [address, isActive, startSession, startSessionMutation]);
-
-  // Record game result
-  const trackGameResult = (result: GameResult) => {
-    if (!address || !sessionId) return;
-    
-    recordGameResult({
-      playerId: address,
-      gameData: result
+  /**
+   * Rastreia o resultado de um jogo
+   * @param gameType Tipo do jogo (ex: 'plinko', 'slots')
+   * @param betAmount Valor da aposta
+   * @param winAmount Valor ganho (0 se perdeu)
+   * @param gameData Dados específicos do jogo
+   */
+  const trackGameResult = useCallback((
+    gameType: string,
+    betAmount: number,
+    winAmount: number,
+    gameData?: Record<string, any>
+  ) => {
+    // Implementação futura para rastrear resultados
+    console.log('Game result tracked:', {
+      gameType,
+      betAmount,
+      winAmount,
+      gameData,
+      timestamp: new Date().toISOString()
     });
-  };
+  }, []);
 
-  // End session
-  const endGameSession = () => {
-    if (sessionId) {
-      endSessionMutation(sessionId, {
-        onSuccess: () => {
-          endSession();
-          sessionStarted.current = false;
-        }
-      });
-    }
-  };
+  /**
+   * Inicia uma nova sessão de jogo
+   * @param gameType Tipo do jogo
+   */
+  const startGameSession = useCallback((gameType: string) => {
+    // Implementação futura para iniciar sessão
+    console.log('Game session started:', {
+      gameType,
+      timestamp: new Date().toISOString()
+    });
+  }, []);
+
+  /**
+   * Encerra a sessão de jogo atual
+   */
+  const endGameSession = useCallback(() => {
+    // Implementação futura para encerrar sessão
+    console.log('Game session ended:', {
+      timestamp: new Date().toISOString()
+    });
+  }, []);
+
+  /**
+   * Obtém estatísticas do jogador
+   * @param gameType Tipo do jogo (opcional)
+   */
+  const getPlayerStats = useCallback((gameType?: string) => {
+    // Implementação futura para obter estatísticas
+    return {
+      totalBets: 0,
+      totalWins: 0,
+      totalLosses: 0,
+      winRate: 0,
+      totalWagered: 0,
+      totalPayout: 0
+    };
+  }, []);
 
   return {
     trackGameResult,
+    startGameSession,
     endGameSession,
-    sessionId,
-    isActive
+    getPlayerStats
   };
 };

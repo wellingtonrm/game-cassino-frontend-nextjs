@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuth } from '@/providers/auth-provider';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
@@ -10,7 +10,7 @@ import { RiskAnalysis } from '@/components/RiskAnalysis';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function DashboardPage() {
-  const { isAuthenticated, address, logout } = useAuthStore();
+  const { state: { isAuthenticated, address }, logout } = useAuth();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('statistics');
 

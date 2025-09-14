@@ -1,41 +1,42 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
-import { useAccount, useChainId, useSwitchChain } from 'wagmi'
-import { polygon } from 'wagmi/chains'
-import { useNavigationStore } from '@/stores/navigationStore'
 import { 
   AlertTriangle, 
   Wallet, 
   Copy, 
   ExternalLink, 
   RefreshCw, 
-  ChevronDown,
-  ChevronUp,
   CheckCircle, 
   XCircle,
-  Bell,
-  Settings,
-  Scan,
   Send,
-  ArrowUpDown,
   Wifi,
   WifiOff
 } from 'lucide-react'
 import { useWeb3Wallet } from '@/hooks/useWeb3Wallet'
-import { useUSDTBalance } from '@/hooks/useUSDTBalance'
-import { useSessionCookie } from '@/hooks/useSessionCookie'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Toggle } from '@/components/ui/toggle'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { formatAddress } from '@/lib/utils'
+import { useAuth } from '@/providers/auth-provider'
 
 export default function WalletPage() {
+  const { state: { isAuthenticated, isLoading, isConnecting } } = useAuth();
+  const {
+    address: walletAddress,
+    ensName,
+    isConnected,
+    isLoading: walletLoading,
+    error,
+    isOnline,
+    connectionStatus,
+    balances,
+    isCorrectNetwork,
+    disconnect,
+    refreshBalances,
+    clearError
+  } = useWeb3Wallet();
+  
   const [copied, setCopied] = useState(false)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [expandedTokens, setExpandedTokens] = useState<Record<string, boolean>>({})
@@ -48,78 +49,15 @@ export default function WalletPage() {
     thorchain: false,
     dash: false
   })
-  
-  const { setPageLoading } = useNavigationStore()
-  
-  // When the component is mounted, set loading to false
-  useEffect(() => {
-    // Simulate component loading time
-    const timer = setTimeout(() => {
-      setPageLoading(false)
-    }, 700) // 700ms delay to simulate loading
-    
-    return () => clearTimeout(timer)
-  }, [setPageLoading])
-  
-  // Custom hooks
-  const {
-    address: walletAddress,
-    ensName,
-    isConnected,
-    chainId,
-    connector,
-    isLoading,
-    error,
-    isOnline,
-    connectionStatus,
-    isCorrectNetwork,
-    balances,
-    disconnect,
-    refreshBalances,
-    clearError,
-  } = useWeb3Wallet()
-  
-  const { saveSession, loadSession, hasValidSession, getSessionInfo } = useSessionCookie()
-  
-  // Session state
-  const [sessionInfo, setSessionInfo] = useState<any>(null)
-  
-  // Load session information when mounting
-  useEffect(() => {
-    const info = getSessionInfo()
-    setSessionInfo(info)
-  }, [getSessionInfo])
-  
-  // Save session when connecting
-  useEffect(() => {
-    if (isConnected && walletAddress && chainId && connector) {
-      saveSession({
-        address: walletAddress,
-        chainId,
-        maticBalance: balances.matic.balance,
-        usdtBalance: balances.usdt.balance,
-        connector,
-        connectedAt: Date.now(),
-        lastUpdated: Date.now(),
-      })
-    }
-  }, [isConnected, walletAddress, chainId, connector, balances, saveSession])
-
   const handleRefresh = async () => {
-    if (isRefreshing) return
     setIsRefreshing(true)
     try {
       await refreshBalances()
+    } catch (error) {
+      console.error('Erro ao atualizar saldos:', error)
     } finally {
       setIsRefreshing(false)
     }
-  }
-
-  const toggleToken = (token: string) => {
-    setTokenToggles(prev => ({
-      ...prev,
-      [token]: !prev[token]
-    }))
   }
 
   const toggleTokenExpand = (token: string) => {

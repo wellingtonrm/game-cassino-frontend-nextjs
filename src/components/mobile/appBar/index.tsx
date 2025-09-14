@@ -4,10 +4,12 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import Logo from '@/components/Logo';
 import WalletDrawer from './walletDrawer';
-import { useAccountWallet } from '@/hooks/useAccountWallet';
 import { Button } from '@/components/ui/button';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { Wallet } from 'lucide-react';
+import { useAuth } from '@/providers/auth-provider';
+import { useWeb3Wallet } from '@/hooks/useWeb3Wallet';
+import { useAccount } from 'wagmi';
 
 interface AppBarProps {
   className?: string;
@@ -16,7 +18,17 @@ interface AppBarProps {
 const AppBar: React.FC<AppBarProps> = ({ 
   className 
 }) => {
-  const { hasWalletSession } = useAccountWallet();
+     const { address  } = useAccount()
+    const {balances} = useWeb3Wallet()
+    const { state: { isAuthenticated, isLoading }, authenticate } = useAuth()
+    // Calculate total USD value from individual balances
+    const totalUSDValue = (balances?.matic?.usdValue !== undefined ? parseFloat(balances.matic.usdValue.toString()) : 0) + 
+                          (balances?.usdt?.usdValue !== undefined ? parseFloat(balances.usdt.usdValue.toString()) : 0);
+    
+    // Provide default network name
+    const networkName = 'Polygon';
+
+  
 
   return (
     <>
@@ -30,7 +42,7 @@ const AppBar: React.FC<AppBarProps> = ({
         {/* Header Actions */}
         <div className="flex items-center gap-3">
           {/* Wallet Icon Button */}
-          {hasWalletSession() ? (
+          {isAuthenticated ? (
            <WalletDrawer /> 
           ):(
           <ConnectButton.Custom>

@@ -7,9 +7,5 @@ import { AuthCookies } from './cookies';
 export const logout = () => {
   // Remove todos os cookies de autenticação usando o novo sistema
   AuthCookies.clearAuthCookies();
-  
-  // Redireciona para a página de login se estiver no cliente
-  if (typeof window !== 'undefined') {
-    window.location.href = '/login';
-  }
+
 };

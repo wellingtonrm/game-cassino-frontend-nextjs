@@ -181,6 +181,6 @@ export const ERC20_ABI = [
 export const rainbowKitConfig = {
   appName: 'PolDex - Premium Casino Platform',
   appDescription: 'Casino online com apostas em USDT na Polygon',
-  appUrl: 'https://raspadinha-casino.com',
+  appUrl: 'https://game-omega-henna.vercel.app',
   appIcon: '/favicon.ico',
 }

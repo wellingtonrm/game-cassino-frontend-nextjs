@@ -11,9 +11,8 @@ const PUBLIC_ROUTES = [
   '/game',
 ] as const;
 
-const PROTECTED_ROUTES = [
-
-] as const;
+// Não há rotas protegidas - apenas componentes protegidos
+// const PROTECTED_ROUTES = [] as const;
 
 // Rotas específicas para mobile e desktop
 const MOBILE_ROUTES = [
@@ -39,9 +38,9 @@ const SECURITY_HEADERS = {
 } as const;
 
 const LOGIN_PAGE = '/auth';
-const DEFAULT_DASHBOARD = '/wallet';
-const MOBILE_DASHBOARD = '/m/wallet';
-const DESKTOP_DASHBOARD = '/d/wallet';
+const DEFAULT_DASHBOARD = '/dashboard';
+const MOBILE_DASHBOARD = '/m/dashboard';
+const DESKTOP_DASHBOARD = '/d/dashboard';
 
 // ======================== UTILITY FUNCTIONS ========================
 
@@ -82,9 +81,10 @@ function isSystemRoute(pathname: string): boolean {
 
 /**
  * Verifica se é uma rota protegida que requer autenticação
+ * Como não há rotas protegidas, sempre retorna false
  */
 function isProtectedRoute(pathname: string): boolean {
-  return PROTECTED_ROUTES.some(route => matchRoute(pathname, route));
+  return false; // Não há rotas protegidas - apenas componentes protegidos
 }
 
 /**
@@ -206,34 +206,8 @@ export async function middleware(request: NextRequest): Promise<NextResponse | u
     return createSecureResponse();
   }
 
-  // Para rotas protegidas, verifica autenticação
-  if (isProtectedRoute(pathname)) {
-    const token = extractAccessToken(request);
-    
-    // Se não tem token, redireciona para login
-    if (!token) {
-      return NextResponse.redirect(new URL(LOGIN_PAGE, request.url));
-    }
-
-    try {
-      // Verifica token
-      const payload = await verifyJWTToken(token);
-      if (!payload) {
-        const response = NextResponse.redirect(new URL(LOGIN_PAGE, request.url));
-        response.cookies.delete('accessToken');
-        response.cookies.delete('account');
-        return response;
-      }
-
-      // Token válido, permite acesso
-      return createSecureResponse();
-    } catch {
-      const response = NextResponse.redirect(new URL(LOGIN_PAGE, request.url));
-      response.cookies.delete('accessToken');
-      response.cookies.delete('account');
-      return response;
-    }
-  }
+  // Não há verificação de rotas protegidas - apenas componentes protegidos
+  // A autenticação é gerenciada pelos hooks e componentes
 
   // Se usuário autenticado está tentando acessar página de login, redireciona para dashboard
   if (pathname === LOGIN_PAGE) {
