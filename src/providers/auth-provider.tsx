@@ -21,10 +21,13 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { address, isConnected } = useAccount();
-  const { data: nonceResponse, isLoading: isNonceLoading } = useNonceQuery(address || '');
+  const {
+    data: nonceResponse,
+    isLoading: isNonceLoading
+  } = useNonceQuery(address || '');
   const { signMessageAsync, isPending: isSigning } = useSignMessage();
   const { mutateAsync: loginMutationAsync, isPending: isLoggingIn } = useLogin();
-  
+
   const [authState, setAuthState] = useState<AuthState>({
     isAuthenticated: false,
     address: null,
@@ -33,12 +36,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   });
 
 
-  const isVerefildAddressCookies = useCallback((address?: string):boolean => {
-     const savedAddress = Cookies.get('wallet_address');
+  const isVerefildAddressCookies = useCallback((address?: string): boolean => {
+    const savedAddress = Cookies.get('wallet_address');
     return savedAddress ? address === savedAddress : false;
   }, []);
-  
-  const isVefildAccessTokenCookies = useCallback(():boolean => {
+
+  const isVefildAccessTokenCookies = useCallback((): boolean => {
     const savedAccessToken = Cookies.get('wallet_acessToken');
     return savedAccessToken ? true : false;
   }, []);
@@ -63,10 +66,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     try {
       setAuthState(prev => ({ ...prev, isConnecting: true }));
-      
+
       // 1. Assinar o nonce
       const signature = await signMessageAsync({ message: nonceResponse.data.nonce });
-      
+
       // 2. Enviar assinatura para login
       const resultlogin = await loginMutationAsync({
         signature: signature,
@@ -81,7 +84,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             isLoading: false,
             isConnecting: false
           });
-          
+
           // Salvar nos cookies (tokens são gerenciados automaticamente via cookies HTTP)
           Cookies.set('wallet_acessToken', response.data.accessToken, { expires: 7 });
           Cookies.set('wallet_address', address, { expires: 7 });
@@ -92,7 +95,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setAuthState(prev => ({ ...prev, isConnecting: false }));
         }
       });
-      
+
     } catch (error) {
       console.error('Erro na autenticação:', error);
       setAuthState(prev => ({ ...prev, isConnecting: false }));
@@ -107,7 +110,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isLoading: false,
       isConnecting: false
     });
-    
+
     // Limpar cookies
     Cookies.remove('wallet_address');
     Cookies.remove('wallet_acessToken');
@@ -115,17 +118,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Auto-autenticar quando wallet conecta e nonce está disponível
   useEffect(() => {
-    if (nonceResponse?.data.nonce) {
+    if (nonceResponse?.data.nonce && !isVerefildAddressCookies(address) && !isVefildAccessTokenCookies() ) {
       authenticate();
     }
-  }, [nonceResponse]);
+  }, [nonceResponse, isVerefildAddressCookies, isVefildAccessTokenCookies]);
 
-  // Limpar estado quando wallet desconecta
-  useEffect(() => {
-    if (!isConnected) {
-      logout();
-    }
-  }, [isConnected, logout]);
+  // // Limpar estado quando wallet desconecta
+  // useEffect(() => {
+  //   if (!isConnected) {
+  //     logout();
+  //   }
+  // }, [isConnected, logout]);
 
   const contextValue: AuthContextType = {
     state: {
