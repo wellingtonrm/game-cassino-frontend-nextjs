@@ -16,6 +16,7 @@ import { formatAddress, formatUSD } from '@/web3/util/web3Utils'
 import { Wallet, X, Loader2, AlertCircle, ChevronDown, DollarSign } from 'lucide-react'
 import { useAuth } from '@/providers/auth-provider'
 import { useAccount } from 'wagmi'
+import Image  from 'next/image'
 
 const WalletDrawer = ()=> {
     const { address, isConnected,  } = useAccount()
@@ -46,18 +47,20 @@ const WalletDrawer = ()=> {
         <Drawer>
             <DrawerTrigger asChild>
                 <Button
-                    className="bg-gradient-to-r from-[#1A2040] to-[#2A3050] hover:from-[#2A3050] hover:to-[#3A4060] border border-[#fdbf5c]/20 hover:border-[#fdbf5c]/40 px-4 py-2 rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105 backdrop-blur-sm"
+                    className="bg-[#202026]  px-4 py-2 rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105 backdrop-blur-sm"
                     aria-label="Open wallet"
                 >
                     <div className="flex items-center gap-2 min-w-0">
-                        <div className="flex-shrink-0 w-6 h-6 bg-[#fdbf5c] rounded-full flex items-center justify-center">
-                            <DollarSign className="h-3 w-3 text-[#121214] font-bold" />
-                        </div>
+                                                 <Image src={"/cript-icons/usdt.svg"} width={25} height={25} alt="wallet" />
+
+                        {/* <div className="flex-shrink-0 w-6 h-6 bg-[#fdbf5c] rounded-full flex items-center justify-center">
+                             <DollarSign className="h-3 w-3 text-[#121214] font-bold" /> 
+                         </div> */}
                         <div className="flex flex-col items-start min-w-0">
                             <span className="text-xs text-gray-400 leading-none">USDT</span>
                             <span className="text-sm font-semibold text-white leading-none truncate">
                                 {isAuthenticated && balances?.usdt ? 
-                                    formatUSD(balances.usdt.usdValue || 0) : 
+                                    formatUSD(balances.usdt.usdValue || 0.000000) : 
                                     '--'
                                 }
                             </span>

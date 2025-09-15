@@ -33,7 +33,7 @@ const AppBar: React.FC<AppBarProps> = ({
   return (
     <>
       <header className={cn(
-        "backdrop-blur-lg px-4 py-3 flex items-center justify-between shadow-lg sticky top-0 z-50 border-b border-[#1A2040]",
+        "backdrop-blur-lg px-4 py-3 flex items-center justify-between shadow-lg sticky top-0 z-50",
         className
       )}>
         {/* Logo */}
