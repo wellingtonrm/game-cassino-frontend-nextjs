@@ -1,5 +1,3 @@
-import AppBar from "@/components/mobile/appBar";
-import BottomNavigationBar from "@/components/mobile/bottomNavigationBar";
 import type { Metadata, Viewport } from "next";
 
 export const metadata: Metadata = {

@@ -6,17 +6,21 @@ import Logo from '@/components/Logo';
 import WalletDrawer from './walletDrawer';
 import { Button } from '@/components/ui/button';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { Wallet } from 'lucide-react';
+import { Wallet, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/providers/auth-provider';
 import { useWeb3Wallet } from '@/hooks/useWeb3Wallet';
 import { useAccount } from 'wagmi';
 
 interface AppBarProps {
   className?: string;
+  isBackButtonVisible?: boolean;
+  onBack?: () => void;
 }
 
 const AppBar: React.FC<AppBarProps> = ({ 
-  className 
+  className,
+  isBackButtonVisible = false,
+  onBack
 }) => {
      const { address  } = useAccount()
     const {balances} = useWeb3Wallet()
@@ -36,8 +40,20 @@ const AppBar: React.FC<AppBarProps> = ({
         "backdrop-blur-lg px-4 py-3 flex items-center justify-between shadow-lg sticky top-0 z-50",
         className
       )}>
-        {/* Logo */}
-        <Logo />
+        {/* Logo e Botão de Voltar */}
+        <div className="flex items-center gap-3">
+          {isBackButtonVisible && (
+            <Button
+              onClick={onBack}
+              variant="ghost"
+              size="sm"
+              className="p-2 hover:bg-white/10"
+            >
+              <ArrowLeft className="w-5 h-5 text-white" />
+            </Button>
+          )}
+          <Logo />
+        </div>
         
         {/* Header Actions */}
         <div className="flex items-center gap-3">

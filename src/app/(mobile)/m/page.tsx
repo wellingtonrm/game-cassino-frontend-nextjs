@@ -15,13 +15,15 @@ import CassinoPage from '@/components/mobile/itensPage/cassino'
 import EsportsPage from '@/components/mobile/itensPage/esports'
 import WalletPage from '@/components/mobile/itensPage/wallet'
 import ProfilePage from '@/components/mobile/itensPage/profile'
+import { useAuth } from '@/providers/auth-provider'
 
 
 
 
 export default function MobileCasinoPage() {
   const { activeTab} = useNavigationStore()
-  const { balance, formatBalance } = usePlinkoStore()
+  const {state:{isLoading}} = useAuth();
+  
   
   // Função para renderizar o componente correto com base na aba ativa
   const renderActiveComponent = () => {
@@ -41,18 +43,18 @@ export default function MobileCasinoPage() {
     }
   }
 
+  if(isLoading){
+    return(
+      <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+    )
+  }
   return (
     <div className="min-h-screen  text-white flex flex-col">
       {/* App Bar */}  
       <AppBar />
       
       {/* Conteúdo Principal - Renderiza o componente ativo com loading */}
-     
-       <Suspense fallback={ <div className="flex-1 flex items-center justify-center">
-            <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
-          </div>}>
           {renderActiveComponent()}
-      </Suspense>
       {/* Barra de Navegação Inferior */}
       <BottomNavigationBar />
     </div>
