@@ -49,7 +49,7 @@ const AppBar: React.FC<AppBarProps> = ({
             {({ openConnectModal }) => (
               <Button 
                 onClick={openConnectModal}
-                className="w-full bg-gradient-to-r from-[#fdbf5c] to-[#f69a0b] hover:from-[#f69a0b] hover:to-[#fdbf5c] text-[#121214] font-semibold py-2 px-4 rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-[#fdbf5c]/25 flex items-center"
+                className="w-full bg-gradient-to-r  from-[#FF970F] to-[#DE041A] hover:from-[#f69a0b] hover:to-[#fdbf5c] text-[#121214] font-semibold py-2 px-4 rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-[#fdbf5c]/25 flex items-center"
                 size="lg"
               >
                 <Wallet className="mr-2 h-5 w-5" />

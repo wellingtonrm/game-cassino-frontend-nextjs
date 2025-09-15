@@ -142,13 +142,13 @@ export default function HomePage() {
                 <div className="flex gap-2">
                   <button
                     onClick={scrollLeft}
-                    className="w-8 h-8 bg-[#1A2040] hover:bg-[#2A3050] rounded-full flex items-center justify-center transition-colors"
+                    className="w-8 h-8 bg-[#202026] hover:bg-[#2A3050] rounded-full flex items-center justify-center transition-colors"
                   >
                     <ChevronLeft className="w-4 h-4 text-[#fdbf5c]" />
                   </button>
                   <button
                     onClick={scrollRight}
-                    className="w-8 h-8 bg-[#1A2040] hover:bg-[#2A3050] rounded-full flex items-center justify-center transition-colors"
+                    className="w-8 h-8 bg-[#202026] hover:bg-[#2A3050] rounded-full flex items-center justify-center transition-colors"
                   >
                     <ChevronRight className="w-4 h-4 text-[#fdbf5c]" />
                   </button>
@@ -208,7 +208,7 @@ export default function HomePage() {
 
                       {/* Play Button */}
                       <RippleButton
-                        className="w-full bg-gradient-to-r from-[#fdbf5c] to-[#f69a0b] hover:from-[#f69a0b] hover:to-[#fdbf5c] text-[#121214] font-semibold py-3 px-4 rounded-lg text-sm transition-all duration-300 shadow-lg hover:shadow-xl"
+                        className="w-full bg-gradient-to-l  from-[#FF970F] to-[#DE041A] hover:from-[#f69a0b] hover:to-[#fdbf5c] text-[#121214] font-semibold py-3 px-4 rounded-lg text-sm transition-all duration-300 shadow-lg hover:shadow-xl"
                         onClick={(e) => {
                           e.stopPropagation()
                           router.push(game.route)

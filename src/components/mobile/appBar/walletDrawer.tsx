@@ -16,25 +16,25 @@ import { formatAddress, formatUSD } from '@/web3/util/web3Utils'
 import { Wallet, X, Loader2, AlertCircle, ChevronDown, DollarSign } from 'lucide-react'
 import { useAuth } from '@/providers/auth-provider'
 import { useAccount } from 'wagmi'
-import Image  from 'next/image'
+import Image from 'next/image'
 
-const WalletDrawer = ()=> {
-    const { address, isConnected,  } = useAccount()
+const WalletDrawer = () => {
+    const { address, isConnected, } = useAccount()
     const {
         balances,
         isCorrectNetwork,
         disconnect
     } = useWeb3Wallet()
-    
-    const { 
-        state: { isAuthenticated, isLoading }, 
-        authenticate 
+
+    const {
+        state: { isAuthenticated, isLoading },
+        authenticate
     } = useAuth()
 
     // Calculate total USD value from individual balances
-    const totalUSDValue = (balances?.matic?.usdValue !== undefined ? parseFloat(balances.matic.usdValue.toString()) : 0) + 
-                          (balances?.usdt?.usdValue !== undefined ? parseFloat(balances.usdt.usdValue.toString()) : 0);
-    
+    const totalUSDValue = (balances?.matic?.usdValue !== undefined ? parseFloat(balances.matic.usdValue.toString()) : 0) +
+        (balances?.usdt?.usdValue !== undefined ? parseFloat(balances.usdt.usdValue.toString()) : 0);
+
     // Provide default network name
     const networkName = 'Polygon';
 
@@ -51,7 +51,7 @@ const WalletDrawer = ()=> {
                     aria-label="Open wallet"
                 >
                     <div className="flex items-center gap-2 min-w-0">
-                                                 <Image src={"/cript-icons/usdt.svg"} width={25} height={25} alt="wallet" />
+                        <Image src={"/cript-icons/usdt.svg"} width={25} height={25} alt="wallet" />
 
                         {/* <div className="flex-shrink-0 w-6 h-6 bg-[#fdbf5c] rounded-full flex items-center justify-center">
                              <DollarSign className="h-3 w-3 text-[#121214] font-bold" /> 
@@ -59,8 +59,8 @@ const WalletDrawer = ()=> {
                         <div className="flex flex-col items-start min-w-0">
                             <span className="text-xs text-gray-400 leading-none">USDT</span>
                             <span className="text-sm font-semibold text-white leading-none truncate">
-                                {isAuthenticated && balances?.usdt ? 
-                                    formatUSD(balances.usdt.usdValue || 0.000000) : 
+                                {isAuthenticated && balances?.usdt ?
+                                    formatUSD(balances.usdt.usdValue || 0.000000) :
                                     '--'
                                 }
                             </span>
@@ -111,7 +111,7 @@ const WalletDrawer = ()=> {
                         {!isAuthenticated && (
                             <div className="bg-[#1A2040] rounded-lg p-4">
                                 <h3 className="text-sm font-medium text-gray-400 mb-2">Autenticação</h3>
-                               
+
                                 <Button
                                     onClick={() => authenticate()}
                                     disabled={isLoading}
