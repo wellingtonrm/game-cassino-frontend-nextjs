@@ -8,9 +8,9 @@ import { useAuth } from '@/providers/auth-provider'
 import { colors } from '@/lib/design-system'
 
 // Componentes do jogo Mines
-import GameBoard from '@/components/mobile/mines/GameBoard'
-import ControlsPanel from '@/components/mobile/mines/ControlsPanel'
-import MinesSelector from '@/components/mobile/mines/MinesSelector'
+import GameBoard from '@/components/mines/GameBoard'
+import BetAmount  from '@/components/mines/BetAmount'
+import MinesSelector from '@/components/mines/MinesSelector'
 import AppBar from '@/components/mobile/appBar'
 
 // Estados das células
@@ -75,7 +75,7 @@ export default function MinesPage() {
         </div>
 
         {/* Controls Panel */}
-        <ControlsPanel 
+        <BetAmount 
           betAmount={gameState.betAmount}
           balance={0}
           isPlaying={gameState.isPlaying}

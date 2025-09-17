@@ -4,11 +4,7 @@ import React from 'react'
 import { TrendingUp, Trophy, Target, Zap, Crown, Settings, Play, Star, Users, DollarSign } from 'lucide-react'
 import { RippleButton } from '@/components/ui/RippleButton'
 import { colors } from '@/lib/design-system'
-import { cn } from '@/lib/utils'
-
-interface HomePageProps {
-  onNavigateToGame?: (game: string) => void
-}
+import { useRouter } from 'next/navigation'
 
 const gameCards = [
   {
@@ -52,7 +48,22 @@ const stats = [
   { label: 'Taxa de Vitória', value: '94.5%', icon: Star }
 ]
 
-export default function HomePage({ onNavigateToGame }: HomePageProps) {
+export default function HomePage() {
+const router = useRouter()
+
+const onNavigateToGame = (title: string): void => {
+  const page = title.toLowerCase();
+
+  router.push(`/game/${page}`)
+}
+
+
+
+
+
+
+
+  
   return (
     <div className="p-6 space-y-8">
       {/* Welcome Section */}
@@ -120,10 +131,13 @@ export default function HomePage({ onNavigateToGame }: HomePageProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {gameCards.map((game) => {
             const Icon = game.icon
+
+          
+
             return (
               <RippleButton
                 key={game.id}
-                onClick={() => onNavigateToGame?.(game.id)}
+                onClick={() => onNavigateToGame?.(game.title)}
                 className="group relative overflow-hidden rounded-xl border hover:scale-105 transition-all duration-300"
                 style={{
                   backgroundColor: colors.mediumGray + '10',

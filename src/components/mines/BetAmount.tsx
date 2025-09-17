@@ -6,7 +6,7 @@ import { RippleButton } from '@/components/ui/RippleButton'
 import { cn } from '@/lib/utils'
 import { colors } from '@/lib/design-system'
 
-interface ControlsPanelProps {
+interface BetAmountProps {
   betAmount: number
   balance: number
   isPlaying: boolean
@@ -17,7 +17,7 @@ interface ControlsPanelProps {
   onResetGame: () => void
 }
 
-const ControlsPanel: React.FC<ControlsPanelProps> = ({
+const BetAmount: React.FC<BetAmountProps> = ({
   betAmount,
   balance,
   isPlaying,
@@ -173,4 +173,4 @@ const ControlsPanel: React.FC<ControlsPanelProps> = ({
   )
 }
 
-export default ControlsPanel
+export default BetAmount
