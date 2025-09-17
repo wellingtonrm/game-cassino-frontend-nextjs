@@ -6,10 +6,11 @@ import { QueryClient } from '@tanstack/react-query'
 
 // Configuração do Wagmi com RainbowKit
 export const wagmiConfig = getDefaultConfig({
-  appName: 'PolDex - Premium Casino Platform ',
-  projectId: process.env.WALLET_CONNECT_PROJECT_ID || '04',
+  appName: 'PolDex - Premium Casino Platform',
+  projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || '01dcda7ca3b2ea4cab5d129c46086f04',
   chains: [polygon, polygonMumbai],
-  ssr: true, // Habilita Server Side Rendering
+  ssr: false,
+   // Desabilita SSR para evitar problemas com WalletConnect
 })
 
 // Cliente do React Query para Web3 with improved error handling
@@ -25,7 +26,8 @@ export const web3QueryClient = new QueryClient({
              error.message.includes('network') || 
              error.message.includes('WebSocket') ||
              error.message.includes('fetch') ||
-             error.message.includes('Failed to fetch'))) {
+             error.message.includes('Failed to fetch') ||
+             error.message.includes('WalletConnect'))) {
           return false;
         }
         // Retry up to 3 times for other errors
@@ -33,17 +35,19 @@ export const web3QueryClient = new QueryClient({
       },
       refetchOnWindowFocus: false,
       refetchOnReconnect: 'always',
-      networkMode: 'always',
+      networkMode: 'online',
     },
     mutations: {
       retry: (failureCount, error) => {
-        // Don't retry on network errors
+        // Don't retry on network errors or WalletConnect errors
         if (error instanceof Error && 
             (error.message.includes('interrupted') || 
              error.message.includes('network') || 
              error.message.includes('WebSocket') ||
              error.message.includes('fetch') ||
-             error.message.includes('Failed to fetch'))) {
+             error.message.includes('Failed to fetch') ||
+             error.message.includes('WalletConnect') ||
+             error.message.includes('User rejected'))) {
           return false;
         }
         // Retry up to 2 times for other errors

@@ -89,9 +89,17 @@ export const useWeb3Wallet = () => {
     chainId: polygon.id,
     // Add query settings for offline support
     query: {
-      enabled: isOnline && wagmiAccount.address !== undefined,
+      enabled: isOnline && wagmiAccount.address !== undefined && wagmiAccount.isConnected,
       gcTime: 1000 * 60 * 60 * 24, // 24 hours
       staleTime: 1000 * 60 * 5, // 5 minutes
+      retry: (failureCount, error) => {
+        if (error instanceof Error && 
+            (error.message.includes('WalletConnect') || 
+             error.message.includes('User rejected'))) {
+          return false;
+        }
+        return failureCount < 2;
+      }
     }
   })
 
@@ -104,9 +112,17 @@ export const useWeb3Wallet = () => {
     chainId: polygon.id,
     // Add query settings for offline support
     query: {
-      enabled: isOnline && wagmiAccount.address !== undefined,
+      enabled: isOnline && wagmiAccount.address !== undefined && wagmiAccount.isConnected,
       gcTime: 1000 * 60 * 60 * 24, // 24 hours
       staleTime: 1000 * 60 * 5, // 5 minutes
+      retry: (failureCount, error) => {
+        if (error instanceof Error && 
+            (error.message.includes('WalletConnect') || 
+             error.message.includes('User rejected'))) {
+          return false;
+        }
+        return failureCount < 2;
+      }
     }
   })
 
@@ -122,10 +138,12 @@ export const useWeb3Wallet = () => {
   // Handle network status changes
   useEffect(() => {
     if (!isOnline && isConnected) {
-      setError('Connection lost. Please check your internet connection.')
-    } else if (isOnline && error && error.includes('Connection lost')) {
+      setError('Conexão perdida. Verifique sua conexão com a internet.')
+    } else if (isOnline && error && error.includes('Conexão perdida')) {
       // Clear connection lost error when back online
       setError(null)
+      // Refresh balances when back online
+      refreshBalances()
     }
   }, [isOnline, isConnected, error, setError])
 
@@ -196,12 +214,18 @@ export const useWeb3Wallet = () => {
   // Função para atualizar saldos manualmente
   const refreshBalances = useCallback(async () => {
     if (!isOnline) {
-      setError('Cannot refresh balances while offline')
+      setError('Não é possível atualizar saldos offline')
+      return
+    }
+
+    if (!wagmiAccount.isConnected || !wagmiAccount.address) {
+      setError('Carteira não conectada')
       return
     }
 
     try {
       setLoading(true)
+      setError(null)
       await Promise.all([
         refetchMaticBalance(),
         refetchUSDTBalance(),
@@ -209,11 +233,15 @@ export const useWeb3Wallet = () => {
       updateSession()
     } catch (error) {
       console.error('Erro ao atualizar saldos:', error)
-      setError('Erro ao atualizar saldos')
+      if (error instanceof Error && error.message.includes('WalletConnect')) {
+        setError('Erro de conexão com a carteira. Tente reconectar.')
+      } else {
+        setError('Erro ao atualizar saldos')
+      }
     } finally {
       setLoading(false)
     }
-  }, [isOnline, refetchMaticBalance, refetchUSDTBalance, updateSession, setLoading, setError])
+  }, [isOnline, wagmiAccount.isConnected, wagmiAccount.address, refetchMaticBalance, refetchUSDTBalance, updateSession, setLoading, setError])
 
   // Verifica se está na rede correta
   const isCorrectNetwork = isPolygonNetwork(chainId || 0)

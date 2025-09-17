@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "@/styles/globals.css";
 import { Providers } from "@/providers/providers";
@@ -12,6 +12,18 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#1a1a2e" },
+    { media: "(prefers-color-scheme: dark)", color: "#1a1a2e" },
+  ],
+};
 
 export const metadata: Metadata = {
   title: "PolDex - Game de cassino online",
@@ -58,17 +70,6 @@ export const metadata: Metadata = {
     description: "Aplicativo de cassino premium com jogos de Plinko, Slots, Roleta e Raspadinha.",
     images: ["/icons/icon-512x512.svg"],
   },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-    viewportFit: "cover",
-  },
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#1a1a2e" },
-    { media: "(prefers-color-scheme: dark)", color: "#1a1a2e" },
-  ],
   other: {
     "mobile-web-app-capable": "yes",
     "apple-mobile-web-app-capable": "yes",
