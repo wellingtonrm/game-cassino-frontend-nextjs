@@ -46,16 +46,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return savedAccessToken ? true : false;
   }, []);
 
-  // Inicializar estado a partir dos cookies
+  // useEffect 1: Gerenciar estado da wallet (conectar/desconectar)
   useEffect(() => {
-    if (address && isVerefildAddressCookies(address) && isVefildAccessTokenCookies()) {
+    if (!address || !isConnected) {
+      console.log('Wallet desconectada, limpando estado de autenticação');
+      setAuthState(prev => ({
+        ...prev,
+        isAuthenticated: false,
+        address: null
+      }));
+    }
+  }, [address, isConnected]);
+
+  // useEffect 2: Verificar e restaurar sessão dos cookies (apenas quando wallet conecta)
+  useEffect(() => {
+    if (!address || !isConnected) return;
+
+    // Verificar se há sessão válida nos cookies para este endereço
+    const hasValidSession = isVerefildAddressCookies(address) && isVefildAccessTokenCookies();
+    
+    if (hasValidSession) {
+      console.log('Restaurando sessão autenticada dos cookies para:', address);
       setAuthState(prev => ({
         ...prev,
         isAuthenticated: true,
         address: address
       }));
+    } else {
+      console.log('Nenhuma sessão válida encontrada nos cookies');
+      setAuthState(prev => ({
+        ...prev,
+        isAuthenticated: false,
+        address: address // Manter o endereço mas não autenticado
+      }));
     }
-  }, [address, isVerefildAddressCookies, isVefildAccessTokenCookies]);
+  }, [address]); // Só executa quando o endereço muda
 
   // Função para autenticar (conectar wallet + assinar + login)
   const authenticate = async () => {
@@ -64,11 +89,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
+    // Verificar se já está autenticado para esta carteira
+    if (authState.isAuthenticated && authState.address === address) {
+      console.log('Usuário já autenticado para esta carteira');
+      return;
+    }
+
     try {
       setAuthState(prev => ({ ...prev, isConnecting: true }));
 
-      // 1. Assinar o nonce
+      console.log('Solicitando assinatura para carteira:', address);
+      
+      // 1. Assinar o nonce - força assinatura para todas as carteiras
       const signature = await signMessageAsync({ message: nonceResponse.data.nonce });
+
+      console.log('Assinatura obtida, realizando login...');
 
       // 2. Enviar assinatura para login
       const resultlogin = await loginMutationAsync({
@@ -76,7 +111,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         address: address,
       }, {
         onSuccess: (response) => {
-          console.log(response)
+          console.log('Login bem-sucedido:', response)
           // 3. Atualizar estado após login bem-sucedido
           setAuthState({
             isAuthenticated: true,
@@ -88,7 +123,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // Salvar nos cookies (tokens são gerenciados automaticamente via cookies HTTP)
           Cookies.set('wallet_acessToken', response.data.accessToken, { expires: 7 });
           Cookies.set('wallet_address', address, { expires: 7 });
-          console.log('Login realizado com sucesso');
+          console.log('Login realizado com sucesso para carteira:', address);
         },
         onError: (error) => {
           console.error('Erro no login:', error);
@@ -99,6 +134,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error('Erro na autenticação:', error);
       setAuthState(prev => ({ ...prev, isConnecting: false }));
+      
+      // Se o usuário rejeitou a assinatura, mostrar mensagem específica
+      if (error instanceof Error && error.message.includes('User rejected')) {
+        console.log('Usuário rejeitou a assinatura');
+      }
     }
   }
 
@@ -116,19 +156,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     Cookies.remove('wallet_acessToken');
   }, []);
 
-  // Auto-autenticar quando wallet conecta e nonce está disponível
+  // useEffect 3: Auto-autenticar apenas quando necessário (sem sessão válida)
   useEffect(() => {
-    if (nonceResponse?.data.nonce && !isVerefildAddressCookies(address) && !isVefildAccessTokenCookies() ) {
+    // Condições para iniciar autenticação:
+    // 1. Tem nonce disponível
+    // 2. Wallet está conectada
+    // 3. NÃO está autenticado
+    // 4. NÃO está no processo de conexão
+    // 5. Endereço está definido no estado mas não autenticado
+    const shouldAuthenticate = nonceResponse?.data.nonce && 
+        address && 
+        isConnected && 
+        !authState.isAuthenticated && 
+        !authState.isConnecting &&
+        authState.address === address; // Só autentica se o endereço já foi processado
+
+    if (shouldAuthenticate) {
+      console.log('Iniciando processo de autenticação para:', address);
       authenticate();
     }
-  }, [nonceResponse, isVerefildAddressCookies, isVefildAccessTokenCookies]);
+  }, [nonceResponse?.data.nonce, address, isConnected, authState.isAuthenticated, authState.isConnecting, authState.address]);
 
-  // // Limpar estado quando wallet desconecta
-  // useEffect(() => {
-  //   if (!isConnected) {
-  //     logout();
-  //   }
-  // }, [isConnected, logout]);
+  // Limpar estado quando wallet desconecta
+  useEffect(() => {
+    if (!isConnected) {
+      logout();
+    }
+  }, [isConnected, logout]);
 
   const contextValue: AuthContextType = {
     state: {

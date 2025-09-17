@@ -7,7 +7,7 @@ import { QueryClient } from '@tanstack/react-query'
 // Configuração do Wagmi com RainbowKit
 export const wagmiConfig = getDefaultConfig({
   appName: 'PolDex - Premium Casino Platform ',
-  projectId: process.env.WALLET_CONNECT_PROJECT_ID || 'YOUR_PROJECT_ID',
+  projectId: process.env.WALLET_CONNECT_PROJECT_ID || '04',
   chains: [polygon, polygonMumbai],
   ssr: true, // Habilita Server Side Rendering
 })

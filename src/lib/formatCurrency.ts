@@ -1,5 +1,5 @@
   // Format currency in Brazilian format by manually placing commas and periods
-  export const formatCurrency = (value: number) => {
+  export const formatCurrency = (value: number, currency: string) => {
     // Convert to string and remove any existing dots
     let valueStr = value.toString().replace('.', '');
     
