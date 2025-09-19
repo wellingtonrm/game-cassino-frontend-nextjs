@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect } from 'react'
-import { setupWalletConnectErrorHandler, checkWalletConnectHealth } from '@/utils/walletConnectErrorHandler'
 
 /**
  * Hook para corrigir problemas de event listeners do WalletConnect
@@ -9,15 +8,6 @@ import { setupWalletConnectErrorHandler, checkWalletConnectHealth } from '@/util
  */
 export const useWalletConnectFix = () => {
   useEffect(() => {
-    // Configura o handler de erros do WalletConnect
-    const cleanup = setupWalletConnectErrorHandler()
-
-    // Verifica a saúde do WalletConnect após inicialização
-    const healthCheckTimeout = setTimeout(() => {
-      const health = checkWalletConnectHealth()
-      console.log('🔧 WalletConnect Health Check:', health)
-    }, 1000)
-
     // Aguarda a inicialização completa do DOM
     const initializeWalletConnect = () => {
       // Verifica se o WalletConnect está disponível globalmente
@@ -45,8 +35,6 @@ export const useWalletConnectFix = () => {
 
     return () => {
       clearTimeout(timeoutId)
-      clearTimeout(healthCheckTimeout)
-      if (cleanup) cleanup()
     }
   }, [])
 }

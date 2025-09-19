@@ -6,12 +6,8 @@ import { wagmiConfig, web3QueryClient } from '@/web3/config/web3Config';
 import { WagmiProvider } from 'wagmi';
 import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
 import { AuthProvider } from './auth-provider';
-import { useWalletConnectFix } from '@/hooks/useWalletConnectFix';
 
-function ProvidersInner({ children }: { children: React.ReactNode }) {
-  // Aplica a correção do WalletConnect
-  useWalletConnectFix();
-
+export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={web3QueryClient}>
@@ -35,8 +31,4 @@ function ProvidersInner({ children }: { children: React.ReactNode }) {
       </QueryClientProvider>
     </WagmiProvider>
   );
-}
-
-export function Providers({ children }: { children: React.ReactNode }) {
-  return <ProvidersInner>{children}</ProvidersInner>;
 }
